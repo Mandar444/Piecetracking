@@ -218,89 +218,76 @@ async function renderOrders() {
   const orders = await getFilteredOrders();
   ordersContainer.innerHTML = '';
 
-  const makers = ['Vision RX', 'Nikon', 'Yash Optics'];
-  const grouped = orders.reduce((acc, order) => {
-    acc[order.maker] = acc[order.maker] || [];
-    acc[order.maker].push(order);
-    return acc;
-  }, {});
+  if (!orders.length) {
+    const emptyState = document.createElement('p');
+    emptyState.className = 'no-records';
+    emptyState.style.textAlign = 'center';
+    emptyState.style.padding = '20px';
+    emptyState.style.color = 'var(--muted)';
+    emptyState.textContent = 'No prescriptions found matching the filters.';
+    ordersContainer.appendChild(emptyState);
+    return;
+  }
 
-  makers.forEach((maker) => {
-    const section = document.createElement('div');
-    section.className = 'maker-section';
-    const heading = document.createElement('h3');
-    heading.textContent = maker;
-    section.appendChild(heading);
+  const table = document.createElement('table');
+  table.className = 'tracking-table';
+  table.innerHTML = `
+    <thead>
+      <tr>
+        <th>Order #</th>
+        <th>Customer</th>
+        <th>Maker</th>
+        <th>Frame</th>
+        <th>Lens</th>
+        <th>Product</th>
+        <th>Add-On</th>
+        <th>Tint</th>
+        <th>Status</th>
+        <th>Created</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody></tbody>
+  `;
 
-    const makerOrders = grouped[maker] || [];
-
-    if (!makerOrders.length) {
-      const emptyState = document.createElement('p');
-      emptyState.textContent = `No ${maker} prescriptions yet.`;
-      section.appendChild(emptyState);
-      ordersContainer.appendChild(section);
-      return;
-    }
-
-    const table = document.createElement('table');
-    table.className = 'tracking-table';
-    table.innerHTML = `
-      <thead>
-        <tr>
-          <th>Order #</th>
-          <th>Customer</th>
-          <th>Frame</th>
-          <th>Lens</th>
-          <th>Product</th>
-          <th>Add-On</th>
-          <th>Tint</th>
-          <th>Status</th>
-          <th>Created</th>
-          <th>Actions</th>
-        </tr>
-      </thead>
-      <tbody></tbody>
+  const tbody = table.querySelector('tbody');
+  orders.forEach((order) => {
+    const row = document.createElement('tr');
+    row.innerHTML = `
+      <td>${order.orderNumber}</td>
+      <td>${order.customerName}</td>
+      <td><strong>${order.maker}</strong></td>
+      <td>${order.frameName || '-'}</td>
+      <td>${order.lensType}</td>
+      <td>
+        ${order.product || '-'}
+        ${order.lensIndex ? ` (${order.lensIndex} Index)` : ''}
+        ${(order.wpl || order.crp) ? `<br/><span class="price-info-card">WPL: ₹${order.wpl || '-'} | CRP: ₹${order.crp || '-'}</span>` : ''}
+      </td>
+      <td>${order.productAddOn || '-'}</td>
+      <td>${order.tint || '-'}</td>
+      <td>${order.status}</td>
+      <td>${formatDate(order.createdAt)}</td>
+      <td class="action-cell"></td>
     `;
 
-    const tbody = table.querySelector('tbody');
-    makerOrders.forEach((order) => {
-      const row = document.createElement('tr');
-      row.innerHTML = `
-        <td>${order.orderNumber}</td>
-        <td>${order.customerName}</td>
-        <td>${order.frameName || '-'}</td>
-        <td>${order.lensType}</td>
-        <td>
-          ${order.product || '-'}
-          ${order.lensIndex ? ` (${order.lensIndex} Index)` : ''}
-          ${(order.wpl || order.crp) ? `<br/><span class="price-info-card">WPL: ₹${order.wpl || '-'} | CRP: ₹${order.crp || '-'}</span>` : ''}
-        </td>
-        <td>${order.productAddOn || '-'}</td>
-        <td>${order.tint || '-'}</td>
-        <td>${order.status}</td>
-        <td>${formatDate(order.createdAt)}</td>
-        <td class="action-cell"></td>
-      `;
+    const actionCell = row.querySelector('.action-cell');
+    const printBtn = document.createElement('button');
+    printBtn.textContent = 'Print';
+    printBtn.className = 'print-btn';
+    printBtn.addEventListener('click', () => printPrescription(order));
 
-      const actionCell = row.querySelector('.action-cell');
-      const printBtn = document.createElement('button');
-      printBtn.textContent = 'Print';
-      printBtn.className = 'print-btn';
-      printBtn.addEventListener('click', () => printPrescription(order));
+    const deleteBtn = document.createElement('button');
+    deleteBtn.textContent = 'Delete';
+    deleteBtn.className = 'delete-btn';
+    deleteBtn.addEventListener('click', () => removeOrder(order.id));
 
-      const deleteBtn = document.createElement('button');
-      deleteBtn.textContent = 'Delete';
-      deleteBtn.className = 'delete-btn';
-      deleteBtn.addEventListener('click', () => removeOrder(order.id));
-
-      actionCell.appendChild(printBtn);
-      actionCell.appendChild(deleteBtn);
-      tbody.appendChild(row);
-    });
-
-    section.appendChild(table);
-    ordersContainer.appendChild(section);
+    actionCell.appendChild(printBtn);
+    actionCell.appendChild(deleteBtn);
+    tbody.appendChild(row);
   });
+
+  ordersContainer.appendChild(table);
 }
 
 renderOrders();
