@@ -9,12 +9,27 @@
 <body>
   <div class="container">
     <header>
-      <h1>Eyewear Prescription Tracker</h1>
-      <p>Track prescriptions by maker, lens type, custom tint, and status.</p>
+      <div class="site-logo-bar">
+        <div class="site-logo-icon">
+          <svg viewBox="0 0 64 64" aria-hidden="true">
+            <path d="M32 6l6 6 8-2 2 8 6 6-6 6 2 8-8 2-6 6-6-6-8 2-2-8-6-6 6-6-2-8 8-2 6-6z" fill="#fff"/>
+            <circle cx="32" cy="32" r="8" fill="#0b7285"/>
+          </svg>
+        </div>
+        <div class="site-logo-text">
+          <span>Unscene</span>
+          <small>Eyewear Prescriptions</small>
+        </div>
+      </div>
+      <div>
+        <h1>Eyewear Prescription Tracker</h1>
+        <p>Track prescriptions by maker, lens type, custom tint, and status.</p>
+      </div>
     </header>
 
     <section class="form-card">
       <h2>Create New Prescription</h2>
+      <div id="messageBox" class="message-box hidden"></div>
       <form id="order-form">
         <div class="field-row">
           <label for="customerName">Customer Name</label>
@@ -114,7 +129,7 @@
 
         <div class="buttons">
           <button type="submit" class="primary">Save Prescription</button>
-          <button type="button" id="clearStorage">Clear All</button>
+          <button type="button" id="clearStorage">Clear local cache</button>
         </div>
       </form>
     </section>
@@ -142,6 +157,6 @@
     </div>
   </template>
 
-  <script src="app.js"></script>
+  <script type="module" src="app.js"></script>
 </body>
 </html>

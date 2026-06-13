@@ -32,4 +32,26 @@ A simple local web-based system to create and track eyewear prescriptions by len
 3. Do not commit `supabaseConfig.js` to GitHub.
 4. The browser app can use `supabaseClient.js` to connect to Supabase.
 
+### Supabase table schema
+
+Create a `prescriptions` table with these columns:
+- `order_id` text
+- `customer_name` text
+- `order_number` text
+- `maker` text
+- `lens_type` text
+- `product` text
+- `product_add_on` text
+- `tint` text
+- `right_sphere` text
+- `left_sphere` text
+- `right_cylinder` text
+- `left_cylinder` text
+- `right_add` text
+- `left_add` text
+- `pupillary_distance` text
+- `status` text
+- `notes` text
+- `created_at` timestamptz
+
 > Use only the publishable anon key in the browser. Never store your Supabase service role / secret key in client-side code.

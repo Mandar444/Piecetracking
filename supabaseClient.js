@@ -1,18 +1,45 @@
 import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm';
-
-const SUPABASE_URL = window.SUPABASE_URL || (typeof SUPABASE_URL !== 'undefined' ? SUPABASE_URL : 'https://your-project-ref.supabase.co');
-const SUPABASE_ANON_KEY = window.SUPABASE_ANON_KEY || (typeof SUPABASE_ANON_KEY !== 'undefined' ? SUPABASE_ANON_KEY : 'your-anon-key');
+import { SUPABASE_URL, SUPABASE_ANON_KEY } from './supabaseConfig.js';
 
 export const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
+function mapToDatabaseRecord(order) {
+  return {
+    order_id: order.id,
+    customer_name: order.customerName,
+    order_number: order.orderNumber,
+    maker: order.maker,
+    lens_type: order.lensType,
+    product: order.product,
+    product_add_on: order.productAddOn,
+    tint: order.tint,
+    right_sphere: order.rightSphere,
+    left_sphere: order.leftSphere,
+    right_cylinder: order.rightCylinder,
+    left_cylinder: order.leftCylinder,
+    right_add: order.rightAdd,
+    left_add: order.leftAdd,
+    pupillary_distance: order.pupillaryDistance,
+    status: order.status,
+    notes: order.notes,
+    created_at: order.createdAt,
+  };
+}
+
 export async function insertPrescription(prescription) {
-  const { data, error } = await supabase.from('prescriptions').insert([prescription]);
+  const { data, error } = await supabase.from('prescriptions').insert([mapToDatabaseRecord(prescription)]);
   if (error) throw error;
   return data;
 }
 
 export async function fetchPrescriptions() {
-  const { data, error } = await supabase.from('prescriptions').select('*').order('createdAt', { ascending: false });
+  const { data, error } = await supabase.from('prescriptions').select('*').order('created_at', { ascending: false });
+  if (error) throw error;
+  return data;
+}
+
+export async function deletePrescription(orderId) {
+  const { data, error } = await supabase.from('prescriptions').delete().eq('order_id', orderId);
   if (error) throw error;
   return data;
 }

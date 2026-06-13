@@ -1,3 +1,5 @@
+import { fetchPrescriptions, deletePrescription } from './supabaseClient.js';
+
 const STORAGE_KEY = 'eyewearOrders';
 const ordersContainer = document.getElementById('ordersContainer');
 const filterMaker = document.getElementById('filterMaker');
@@ -6,14 +8,43 @@ const filterStatus = document.getElementById('filterStatus');
 const filterSearch = document.getElementById('filterSearch');
 const clearFiltersButton = document.getElementById('clearFilters');
 
-function loadOrders() {
-  const raw = localStorage.getItem(STORAGE_KEY);
-  if (!raw) return [];
+function normalizeOrder(order) {
+  return {
+    id: order.order_id || order.id,
+    customerName: order.customer_name || order.customerName,
+    orderNumber: order.order_number || order.orderNumber,
+    maker: order.maker,
+    lensType: order.lens_type || order.lensType,
+    product: order.product,
+    productAddOn: order.product_add_on || order.productAddOn,
+    tint: order.tint,
+    rightSphere: order.right_sphere || order.rightSphere,
+    leftSphere: order.left_sphere || order.leftSphere,
+    rightCylinder: order.right_cylinder || order.rightCylinder,
+    leftCylinder: order.left_cylinder || order.leftCylinder,
+    rightAdd: order.right_add || order.rightAdd,
+    leftAdd: order.left_add || order.leftAdd,
+    pupillaryDistance: order.pupillary_distance || order.pupillaryDistance,
+    status: order.status,
+    notes: order.notes,
+    createdAt: order.created_at || order.createdAt,
+  };
+}
+
+async function loadOrders() {
   try {
-    return JSON.parse(raw);
+    const remoteOrders = await fetchPrescriptions();
+    return remoteOrders.map(normalizeOrder);
   } catch (error) {
-    console.error('Invalid order data', error);
-    return [];
+    console.warn('Supabase fetch failed, using local orders', error);
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (!raw) return [];
+    try {
+      return JSON.parse(raw);
+    } catch (parseError) {
+      console.error('Invalid local order data', parseError);
+      return [];
+    }
   }
 }
 
@@ -124,13 +155,14 @@ function printPrescription(order) {
   printWindow.document.close();
 }
 
-function getFilteredOrders() {
+async function getFilteredOrders() {
+  const orders = await loadOrders();
   const makerValue = filterMaker.value;
   const lensTypeValue = filterLensType.value;
   const statusValue = filterStatus.value;
   const searchValue = filterSearch.value.trim().toLowerCase();
 
-  return loadOrders().filter((order) => {
+  return orders.filter((order) => {
     if (makerValue !== 'All' && order.maker !== makerValue) {
       return false;
     }
@@ -148,14 +180,20 @@ function getFilteredOrders() {
   });
 }
 
-function removeOrder(id) {
-  const orders = loadOrders().filter((order) => order.id !== id);
-  saveOrders(orders);
-  renderOrders();
+async function removeOrder(id) {
+  try {
+    await deletePrescription(id);
+  } catch (error) {
+    console.warn('Supabase delete failed, removing from local cache instead', error);
+    const orders = await loadOrders();
+    const updated = orders.filter((order) => order.id !== id);
+    saveOrders(updated);
+  }
+  await renderOrders();
 }
 
-function renderOrders() {
-  const orders = getFilteredOrders();
+async function renderOrders() {
+  const orders = await getFilteredOrders();
   ordersContainer.innerHTML = '';
 
   const makers = ['Vision RX', 'Nikon', 'Yash Optics'];
@@ -238,3 +276,14 @@ function renderOrders() {
 }
 
 renderOrders();
+filterMaker.addEventListener('change', renderOrders);
+filterLensType.addEventListener('change', renderOrders);
+filterStatus.addEventListener('change', renderOrders);
+filterSearch.addEventListener('input', renderOrders);
+clearFiltersButton.addEventListener('click', () => {
+  filterMaker.value = 'All';
+  filterLensType.value = 'All';
+  filterStatus.value = 'All';
+  filterSearch.value = '';
+  renderOrders();
+});

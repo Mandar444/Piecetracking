@@ -1,16 +1,59 @@
+import { insertPrescription, fetchPrescriptions, deletePrescription } from './supabaseClient.js';
+
 const STORAGE_KEY = 'eyewearOrders';
 const form = document.getElementById('order-form');
 const ordersContainer = document.getElementById('ordersContainer');
 const clearStorageButton = document.getElementById('clearStorage');
+const messageBox = document.getElementById('messageBox');
 
-function loadOrders() {
-  const raw = localStorage.getItem(STORAGE_KEY);
-  if (!raw) return [];
+function showMessage(text, type = 'success') {
+  if (!messageBox) return;
+  messageBox.textContent = text;
+  messageBox.className = `message-box ${type}`;
+  messageBox.classList.remove('hidden');
+  window.clearTimeout(showMessage.timeoutId);
+  showMessage.timeoutId = window.setTimeout(() => {
+    messageBox.classList.add('hidden');
+  }, 3500);
+}
+
+function normalizeOrder(order) {
+  return {
+    id: order.order_id || order.id,
+    customerName: order.customer_name || order.customerName,
+    orderNumber: order.order_number || order.orderNumber,
+    maker: order.maker,
+    lensType: order.lens_type || order.lensType,
+    product: order.product,
+    productAddOn: order.product_add_on || order.productAddOn,
+    tint: order.tint,
+    rightSphere: order.right_sphere || order.rightSphere,
+    leftSphere: order.left_sphere || order.leftSphere,
+    rightCylinder: order.right_cylinder || order.rightCylinder,
+    leftCylinder: order.left_cylinder || order.leftCylinder,
+    rightAdd: order.right_add || order.rightAdd,
+    leftAdd: order.left_add || order.leftAdd,
+    pupillaryDistance: order.pupillary_distance || order.pupillaryDistance,
+    status: order.status,
+    notes: order.notes,
+    createdAt: order.created_at || order.createdAt,
+  };
+}
+
+async function loadOrders() {
   try {
-    return JSON.parse(raw);
+    const remoteOrders = await fetchPrescriptions();
+    return remoteOrders.map(normalizeOrder);
   } catch (error) {
-    console.error('Invalid order data', error);
-    return [];
+    console.warn('Supabase fetch failed, using local orders', error);
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (!raw) return [];
+    try {
+      return JSON.parse(raw);
+    } catch (parseError) {
+      console.error('Invalid local order data', parseError);
+      return [];
+    }
   }
 }
 
@@ -60,8 +103,8 @@ function createOrderElement(order) {
   return orderCard;
 }
 
-function renderOrders() {
-  const orders = loadOrders();
+async function renderOrders() {
+  const orders = await loadOrders();
   ordersContainer.innerHTML = '';
 
   if (!orders.length) {
@@ -192,13 +235,21 @@ function printPrescription(order) {
   printWindow.document.close();
 }
 
-function removeOrder(id) {
-  const orders = loadOrders().filter((order) => order.id !== id);
-  saveOrders(orders);
-  renderOrders();
+async function removeOrder(id) {
+  try {
+    await deletePrescription(id);
+    showMessage('Prescription deleted from Supabase.');
+  } catch (error) {
+    console.warn('Supabase delete failed, removing local copy instead', error);
+    const orders = await loadOrders();
+    const updated = orders.filter((order) => order.id !== id);
+    saveOrders(updated);
+    showMessage('Local cache updated after delete failure.', 'error');
+  }
+  await renderOrders();
 }
 
-form.addEventListener('submit', (event) => {
+form.addEventListener('submit', async (event) => {
   event.preventDefault();
   const formData = new FormData(form);
 
@@ -223,17 +274,27 @@ form.addEventListener('submit', (event) => {
     createdAt: new Date().toISOString(),
   };
 
-  const orders = loadOrders();
+  const orders = await loadOrders();
   orders.unshift(order);
   saveOrders(orders);
   form.reset();
-  renderOrders();
+  await renderOrders();
+
+  try {
+    await insertPrescription(order);
+    showMessage('Saved to Supabase.');
+    await renderOrders();
+  } catch (error) {
+    console.error('Supabase save failed', error);
+    showMessage('Saved locally, but Supabase sync failed.', 'error');
+  }
 });
 
 clearStorageButton.addEventListener('click', () => {
-  if (confirm('Clear all saved prescriptions?')) {
+  if (confirm('Clear local cache?')) {
     localStorage.removeItem(STORAGE_KEY);
     renderOrders();
+    showMessage('Local cache cleared.', 'success');
   }
 });
 
