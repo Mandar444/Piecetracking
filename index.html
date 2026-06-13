@@ -37,9 +37,30 @@
           <input id="customerName" name="customerName" type="text" required />
         </div>
 
-        <div class="field-row">
-          <label for="frameName">Frame Name</label>
-          <input id="frameName" name="frameName" type="text" placeholder="e.g. Ray-Ban Wayfarer, Aviator" required />
+        <div class="field-row split">
+          <div style="flex: 1; display: flex; flex-direction: column;">
+            <label for="frameModel">Frame Model</label>
+            <select id="frameModel" name="frameModel" required>
+              <!-- Dynamically populated -->
+            </select>
+          </div>
+          <div id="frame-color-container" style="flex: 1; display: flex; flex-direction: column;">
+            <label for="frameColor">Frame Color</label>
+            <select id="frameColor" name="frameColor">
+              <!-- Dynamically populated -->
+            </select>
+          </div>
+          <div id="frame-lens-color-container" style="flex: 1; display: flex; flex-direction: column;">
+            <label for="frameLensColor">Lens Color</label>
+            <select id="frameLensColor" name="frameLensColor">
+              <!-- Dynamically populated -->
+            </select>
+          </div>
+        </div>
+
+        <div class="field-row hidden" id="custom-frame-row">
+          <label for="customFrameName">Custom Frame Description</label>
+          <input id="customFrameName" name="customFrameName" type="text" placeholder="e.g. Ray-Ban Wayfarer Gold Green" />
         </div>
 
 

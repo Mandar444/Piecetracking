@@ -11,7 +11,13 @@ const pdNearLabel = document.querySelector('label[for="pupillaryDistanceNear"]')
 // Form elements selections
 const orderNumberInput = document.getElementById('orderNumber');
 const regenerateOrderNoBtn = document.getElementById('regenerate-order-no');
-const frameNameInput = document.getElementById('frameName');
+const frameModelSelect = document.getElementById('frameModel');
+const frameColorSelect = document.getElementById('frameColor');
+const frameColorContainer = document.getElementById('frame-color-container');
+const frameLensColorSelect = document.getElementById('frameLensColor');
+const frameLensColorContainer = document.getElementById('frame-lens-color-container');
+const customFrameRow = document.getElementById('custom-frame-row');
+const customFrameInput = document.getElementById('customFrameName');
 const makerSelect = document.getElementById('maker');
 const productSelect = document.getElementById('product');
 const customProductRow = document.getElementById('custom-product-row');
@@ -83,6 +89,229 @@ const PRODUCTS_BY_MAKER = {
   ],
   "Yash Optics": []
 };
+
+// Dynamic frames catalog mapping
+const FRAMES_CATALOG = {
+  "Borderline": {
+    "Gold": ["Green", "Rose", "RX"],
+    "Gunmetal": ["Blue", "Purple", "RX"],
+    "Matte Black": ["BlackFade", "Olive", "RX"]
+  },
+  "Coastline": {
+    "Black Core": ["Purple", "RX"],
+    "Black Shell": ["Black", "RX"],
+    "Champagne": ["Orange", "RX"],
+    "Havana": ["RX", "SkyBlue"],
+    "Matte Black": ["RX", "Yellow"]
+  },
+  "Crossfire": {
+    "Anthracite": ["BlackFade", "RX"],
+    "Bronze": ["GreenFade", "RX"],
+    "Gold": ["Brown", "RX"]
+  },
+  "Downtime": {
+    "Black": ["Black", "RX"],
+    "Black Shell": ["BlackFade", "RX"],
+    "Havana": ["GreenFade", "RX"],
+    "Navy": ["Brown", "RX"],
+    "Smoke": ["Rose", "RX"]
+  },
+  "Fulton": {
+    "Black": ["Orange", "RX"],
+    "Black Shell": ["Black", "RX"],
+    "Emerald": ["RX", "SkyBlue"],
+    "Rust": ["Brown", "RX"],
+    "Smoke": ["Olive", "RX"]
+  },
+  "Highline": {
+    "Anthracite": ["Olive", "RX"],
+    "Gold": ["BrownFade", "Peach", "RX"],
+    "Silver": ["Purple", "RX"]
+  },
+  "Overture": {
+    "Black": ["Black", "RX"],
+    "Black Core": ["Green", "RX"],
+    "Champagne": ["Brown", "RX"],
+    "Navy": ["Black", "RX"],
+    "Sage": ["BrownFade", "RX"]
+  },
+  "Paradox": {
+    "Matte Anthracite": ["Orange", "Purple", "RX"],
+    "Matte Gold": ["Green", "RX"],
+    "Matte Olive": ["Brown", "RX"]
+  },
+  "Portola": {
+    "Black Core": ["Black", "RX"],
+    "Black": ["Purple", "RX"],
+    "Concrete": ["Peach", "RX"],
+    "Havana": ["Brown", "RX"],
+    "Olive": ["Olive", "RX"]
+  },
+  "Prysm": {
+    "Black Core": ["Black", "RX"],
+    "Emerald": ["Black", "RX"],
+    "Matte Black": ["Orange", "RX"],
+    "Matte Smoke": ["Purple", "RX"],
+    "Rust": ["Brown", "RX"]
+  },
+  "Runway": {
+    "Matte Gold": ["Black", "Green Fade", "RX"],
+    "Matte Gunmetal": ["RX", "SkyBlue"],
+    "Olive": ["Green", "RX"]
+  },
+  "Sheer": {
+    "Gold": ["Black", "Olive", "RX"],
+    "Matte Black": ["Green", "Rose", "RX"],
+    "Silver": ["Black", "RX"]
+  },
+  "Slowburn": {
+    "Black": ["BlackFade", "RX"],
+    "Gold": ["BrownFade", "RX"],
+    "Gunmetal": ["GreenFade", "RX"]
+  },
+  "Split": {
+    "Gold": ["Black", "Rose", "RX"],
+    "Matte Black": ["Blue", "RX", "Yellow"],
+    "Matte Silver": ["Blue", "RX"]
+  },
+  "Strand": {
+    "Black": ["Black", "RX"],
+    "Black G": ["Green", "RX"],
+    "Havana": ["Peach", "RX"],
+    "Olive": ["Brown", "RX"],
+    "Wine": ["Black", "RX"]
+  },
+  "Strangelove": {
+    "Anthracite": ["Orange", "Purple", "RX"],
+    "Gold": ["Black", "RX"],
+    "Silver": ["Olive", "RX"]
+  },
+  "Undertone": {
+    "Anthracite": ["Rose", "RX"],
+    "Gold": ["Black", "RX"],
+    "Silver": ["Green", "RX"]
+  },
+  "Vapour": {
+    "Black Shell": ["Blue", "RX"],
+    "Black Shell G": ["Black", "RX"],
+    "Emerald": ["Olive", "RX"],
+    "Glass": ["GreenFade", "RX"],
+    "Rust": ["BrownFade", "RX"]
+  },
+  "Velo": {
+    "Black": ["Black", "Purple"],
+    "Black Shell": ["Black"],
+    "Cobalt": ["Brown"],
+    "Ember": ["Yellow"],
+    "Matte Black": ["Green"]
+  },
+  "Vondel": {
+    "Black": ["Black", "RX"],
+    "Black Shell": ["Rose", "RX"],
+    "Champagne": ["Brown", "RX"],
+    "Havana": ["Green", "RX"],
+    "Teal": ["RX", "SkyBlue"]
+  },
+  "Wireframe": {
+    "Bronze": ["Blue"],
+    "Gold": ["Orange"],
+    "Matte Black": ["BlackFade"],
+    "Silver": ["Purple"]
+  }
+};
+
+// Dynamic frame dropdown populate and cascade logic
+function initializeFrameDropdowns() {
+  if (!frameModelSelect) return;
+  
+  frameModelSelect.innerHTML = '';
+  
+  // Populate Models
+  const models = Object.keys(FRAMES_CATALOG).sort();
+  models.forEach(model => {
+    const opt = document.createElement('option');
+    opt.value = model;
+    opt.textContent = model;
+    frameModelSelect.appendChild(opt);
+  });
+  
+  // Add Custom Option
+  const optCustom = document.createElement('option');
+  optCustom.value = 'custom';
+  optCustom.textContent = 'Other / Custom Frame...';
+  frameModelSelect.appendChild(optCustom);
+  
+  // Default to first model
+  if (models.length > 0) {
+    frameModelSelect.value = models[0];
+  } else {
+    frameModelSelect.value = 'custom';
+  }
+  
+  updateFrameFields();
+}
+
+function updateFrameFields() {
+  const model = frameModelSelect.value;
+  const isCustom = model === 'custom';
+  
+  if (isCustom) {
+    frameColorContainer.classList.add('hidden');
+    frameLensColorContainer.classList.add('hidden');
+    customFrameRow.classList.remove('hidden');
+    customFrameInput.required = true;
+    
+    frameColorSelect.required = false;
+    frameLensColorSelect.required = false;
+  } else {
+    frameColorContainer.classList.remove('hidden');
+    frameLensColorContainer.classList.remove('hidden');
+    customFrameRow.classList.add('hidden');
+    customFrameInput.required = false;
+    customFrameInput.value = '';
+    
+    frameColorSelect.required = true;
+    frameLensColorSelect.required = true;
+    
+    // Populate Colors
+    frameColorSelect.innerHTML = '';
+    const colorsObj = FRAMES_CATALOG[model] || {};
+    const colors = Object.keys(colorsObj);
+    colors.forEach(color => {
+      const opt = document.createElement('option');
+      opt.value = color;
+      opt.textContent = color;
+      frameColorSelect.appendChild(opt);
+    });
+    
+    if (colors.length > 0) {
+      frameColorSelect.value = colors[0];
+    }
+    
+    updateFrameLensColors();
+  }
+}
+
+function updateFrameLensColors() {
+  const model = frameModelSelect.value;
+  const color = frameColorSelect.value;
+  
+  if (model === 'custom' || !color) return;
+  
+  frameLensColorSelect.innerHTML = '';
+  const lensColors = (FRAMES_CATALOG[model] && FRAMES_CATALOG[model][color]) || [];
+  lensColors.forEach(lensColor => {
+    const opt = document.createElement('option');
+    opt.value = lensColor;
+    opt.textContent = lensColor;
+    frameLensColorSelect.appendChild(opt);
+  });
+  
+  if (lensColors.length > 0) {
+    frameLensColorSelect.value = lensColors[0];
+  }
+}
+
 
 // Generates a serial-based order number (e.g. UNC001, UNC002)
 async function updateNextOrderNumber() {
@@ -491,6 +720,9 @@ makerSelect.addEventListener('change', () => {
 productSelect.addEventListener('change', updateProductFields);
 lensIndexSelect.addEventListener('change', updatePriceDisplay);
 
+frameModelSelect.addEventListener('change', updateFrameFields);
+frameColorSelect.addEventListener('change', updateFrameLensColors);
+
 // ARC Coating checkboxes handling
 coatingCbs.forEach(cb => {
   cb.addEventListener('change', () => {
@@ -546,7 +778,15 @@ form.addEventListener('submit', async (event) => {
   const formData = new FormData(form);
 
   const maker = formData.get('maker');
-  const frameName = formData.get('frameName').trim();
+  const frameModel = formData.get('frameModel');
+  let frameName = '';
+  if (frameModel === 'custom') {
+    frameName = formData.get('customFrameName').trim();
+  } else {
+    const frameColor = formData.get('frameColor');
+    const frameLensColor = formData.get('frameLensColor');
+    frameName = `${frameModel} ${frameColor} ${frameLensColor}`;
+  }
   const productVal = formData.get('product');
   const lensIndex = indexRow.classList.contains('hidden') ? '' : formData.get('lensIndex');
   const lensTypeVal = form.querySelector('input[name="lensType"]:checked').value;
@@ -607,6 +847,7 @@ form.addEventListener('submit', async (event) => {
   
   // Reset form and defaults
   form.reset();
+  initializeFrameDropdowns();
   await updateNextOrderNumber();
   
   // Re-apply maker-specific lens type default
@@ -652,6 +893,7 @@ updatePdFields();
 updateNextOrderNumber();
 updateProductDropdown();
 updateTintFields();
+initializeFrameDropdowns();
 
 renderOrders();
 
