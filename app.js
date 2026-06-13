@@ -14,8 +14,6 @@ const regenerateOrderNoBtn = document.getElementById('regenerate-order-no');
 const frameModelSelect = document.getElementById('frameModel');
 const frameColorSelect = document.getElementById('frameColor');
 const frameColorContainer = document.getElementById('frame-color-container');
-const frameLensColorSelect = document.getElementById('frameLensColor');
-const frameLensColorContainer = document.getElementById('frame-lens-color-container');
 const customFrameRow = document.getElementById('custom-frame-row');
 const customFrameInput = document.getElementById('customFrameName');
 const makerSelect = document.getElementById('maker');
@@ -257,21 +255,17 @@ function updateFrameFields() {
   
   if (isCustom) {
     frameColorContainer.classList.add('hidden');
-    frameLensColorContainer.classList.add('hidden');
     customFrameRow.classList.remove('hidden');
     customFrameInput.required = true;
     
     frameColorSelect.required = false;
-    frameLensColorSelect.required = false;
   } else {
     frameColorContainer.classList.remove('hidden');
-    frameLensColorContainer.classList.remove('hidden');
     customFrameRow.classList.add('hidden');
     customFrameInput.required = false;
     customFrameInput.value = '';
     
     frameColorSelect.required = true;
-    frameLensColorSelect.required = true;
     
     // Populate Colors
     frameColorSelect.innerHTML = '';
@@ -287,28 +281,6 @@ function updateFrameFields() {
     if (colors.length > 0) {
       frameColorSelect.value = colors[0];
     }
-    
-    updateFrameLensColors();
-  }
-}
-
-function updateFrameLensColors() {
-  const model = frameModelSelect.value;
-  const color = frameColorSelect.value;
-  
-  if (model === 'custom' || !color) return;
-  
-  frameLensColorSelect.innerHTML = '';
-  const lensColors = (FRAMES_CATALOG[model] && FRAMES_CATALOG[model][color]) || [];
-  lensColors.forEach(lensColor => {
-    const opt = document.createElement('option');
-    opt.value = lensColor;
-    opt.textContent = lensColor;
-    frameLensColorSelect.appendChild(opt);
-  });
-  
-  if (lensColors.length > 0) {
-    frameLensColorSelect.value = lensColors[0];
   }
 }
 
@@ -721,7 +693,6 @@ productSelect.addEventListener('change', updateProductFields);
 lensIndexSelect.addEventListener('change', updatePriceDisplay);
 
 frameModelSelect.addEventListener('change', updateFrameFields);
-frameColorSelect.addEventListener('change', updateFrameLensColors);
 
 // ARC Coating checkboxes handling
 coatingCbs.forEach(cb => {
@@ -784,8 +755,7 @@ form.addEventListener('submit', async (event) => {
     frameName = formData.get('customFrameName').trim();
   } else {
     const frameColor = formData.get('frameColor');
-    const frameLensColor = formData.get('frameLensColor');
-    frameName = `${frameModel} ${frameColor} ${frameLensColor}`;
+    frameName = `${frameModel} ${frameColor}`;
   }
   const productVal = formData.get('product');
   const lensIndex = indexRow.classList.contains('hidden') ? '' : formData.get('lensIndex');
