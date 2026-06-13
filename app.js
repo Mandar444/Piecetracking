@@ -50,6 +50,15 @@ const PRODUCTS_BY_MAKER = {
       indexes: {
         "1.56": { wpl: 260, crp: 900 }
       }
+    },
+    {
+      name: "CRIZAL ROCK",
+      indexes: {
+        "1.50": { wpl: 2210, crp: 5120 },
+        "1.56": { wpl: 2410, crp: 5590 },
+        "1.60": { wpl: 3310, crp: 8210 },
+        "1.67": { wpl: 4500, crp: 10750 }
+      }
     }
   ],
   "Nikon": [
@@ -69,17 +78,6 @@ const PRODUCTS_BY_MAKER = {
       name: "PRESIO FIRST 1.50 TGNS RUBY SCN",
       indexes: {
         "1.50": { wpl: 11650, crp: 31600 }
-      }
-    }
-  ],
-  "Crizal": [
-    {
-      name: "CRIZAL ROCK",
-      indexes: {
-        "1.50": { wpl: 2210, crp: 5120 },
-        "1.56": { wpl: 2410, crp: 5590 },
-        "1.60": { wpl: 3310, crp: 8210 },
-        "1.67": { wpl: 4500, crp: 10750 }
       }
     }
   ],
