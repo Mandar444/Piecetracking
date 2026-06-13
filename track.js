@@ -28,6 +28,8 @@ function normalizeOrder(order) {
     pupillaryDistanceNear: order.pupillary_distance_near || order.pupillaryDistanceNear,
     status: order.status,
     notes: order.notes,
+    wpl: order.wpl,
+    crp: order.crp,
     createdAt: order.created_at || order.createdAt,
   };
 }
@@ -264,7 +266,10 @@ async function renderOrders() {
         <td>${order.orderNumber}</td>
         <td>${order.customerName}</td>
         <td>${order.lensType}</td>
-        <td>${order.product || '-'}</td>
+        <td>
+          ${order.product || '-'}
+          ${(order.wpl || order.crp) ? `<br/><span class="price-info-card">WPL: ₹${order.wpl || '-'} | CRP: ₹${order.crp || '-'}</span>` : ''}
+        </td>
         <td>${order.productAddOn || '-'}</td>
         <td>${order.tint || '-'}</td>
         <td>${order.status}</td>

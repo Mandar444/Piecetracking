@@ -39,7 +39,14 @@
 
         <div class="field-row">
           <label for="orderNumber">Order No.</label>
-          <input id="orderNumber" name="orderNumber" type="text" required />
+          <div class="order-no-container">
+            <input id="orderNumber" name="orderNumber" type="text" required />
+            <button type="button" id="regenerate-order-no" class="btn-icon" title="Regenerate Order No.">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/>
+              </svg>
+            </button>
+          </div>
         </div>
 
         <div class="field-row">
@@ -61,13 +68,28 @@
 
         <div class="field-row">
           <label for="product">Product</label>
-          <input id="product" name="product" type="text" placeholder="e.g. Blue Light, Photochromic" />
+          <select id="product" name="product" required>
+            <!-- Dynamically populated -->
+          </select>
+        </div>
+
+        <div class="field-row hidden" id="custom-product-row">
+          <label for="customProduct">Custom Product Name</label>
+          <input id="customProduct" name="customProduct" type="text" placeholder="Enter custom product name..." />
+        </div>
+
+        <div class="field-row hidden" id="price-info-row">
+          <label>Price Reference (Internal)</label>
+          <div id="price-info-display" class="price-display-box">
+            <!-- Dynamically populated -->
+          </div>
         </div>
 
         <div class="field-row">
           <label for="productAddOn">Product Add-On</label>
-          <input id="productAddOn" name="productAddOn" type="text" placeholder="e.g. Anti-Reflective, Scratch Guard" />
+          <input id="productAddOn" name="productAddOn" type="text" value="Both Side ARC Coating" placeholder="e.g. Anti-Reflective, Scratch Guard" />
         </div>
+
 
         <div class="field-row">
           <label for="tint">Custom Tint</label>

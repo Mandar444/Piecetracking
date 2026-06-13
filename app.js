@@ -9,6 +9,44 @@ const lensTypeSelect = document.getElementById('lensType');
 const pdNearInput = document.getElementById('pupillaryDistanceNear');
 const pdNearLabel = document.querySelector('label[for="pupillaryDistanceNear"]');
 
+// New form elements selections
+const orderNumberInput = document.getElementById('orderNumber');
+const regenerateOrderNoBtn = document.getElementById('regenerate-order-no');
+const makerSelect = document.getElementById('maker');
+const productSelect = document.getElementById('product');
+const customProductRow = document.getElementById('custom-product-row');
+const customProductInput = document.getElementById('customProduct');
+const priceInfoRow = document.getElementById('price-info-row');
+const priceInfoDisplay = document.getElementById('price-info-display');
+
+// Internal reference products mapping
+const PRODUCTS_BY_MAKER = {
+  "Vision RX": [
+    { name: "Satin+ UV Budget RX SV 1.50 index", wpl: 1330, crp: 2950 },
+    { name: "Satin+ UV Budget RX SV 1.56 index", wpl: 1530, crp: 3420 },
+    { name: "Satin+ UV Budget RX SV 1.60 index", wpl: 2430, crp: 6510 },
+    { name: "Satin+ UV Budget SV 1.56 index", wpl: 260, crp: 900 }
+  ],
+  "Nikon": [
+    { name: "Presio First 1.50 scn", wpl: 7650, crp: 22700 },
+    { name: "NK focus dig 15T6G 1.50 ECC", wpl: 6100, crp: 14400 },
+    { name: "Presio First 1.50 TGNS Ruby SCN", wpl: 11650, crp: 31600 }
+  ],
+  "Yash Optics": []
+};
+
+// Generates a random 6 digit order number
+function generateRandomOrderNumber() {
+  const num = Math.floor(100000 + Math.random() * 900000);
+  return `UNS-${num}`;
+}
+
+function initOrderNumber() {
+  if (orderNumberInput) {
+    orderNumberInput.value = generateRandomOrderNumber();
+  }
+}
+
 function showMessage(text, type = 'success') {
   if (!messageBox) return;
   messageBox.textContent = text;
@@ -40,6 +78,8 @@ function normalizeOrder(order) {
     pupillaryDistanceNear: order.pupillary_distance_near || order.pupillaryDistanceNear,
     status: order.status,
     notes: order.notes,
+    wpl: order.wpl,
+    crp: order.crp,
     createdAt: order.created_at || order.createdAt,
   };
 }
@@ -105,6 +145,10 @@ function createOrderElement(order) {
     ['PD (Near)', order.pupillaryDistanceNear || (order.lensType === 'Progressive' ? '-' : 'NA')],
     ['Notes', order.notes || '-'],
   ];
+
+  if (order.wpl || order.crp) {
+    fields.push(['Price Info (Ref)', `WPL: ₹${order.wpl || '-'} | CRP: ₹${order.crp || '-'}`]);
+  }
 
   fields.forEach(([label, value]) => {
     const item = document.createElement('div');
@@ -269,17 +313,99 @@ async function removeOrder(id) {
   await renderOrders();
 }
 
+function updateProductDropdown() {
+  const maker = makerSelect.value;
+  const products = PRODUCTS_BY_MAKER[maker] || [];
+  
+  productSelect.innerHTML = '';
+  
+  products.forEach((prod) => {
+    const opt = document.createElement('option');
+    opt.value = prod.name;
+    opt.textContent = prod.name;
+    productSelect.appendChild(opt);
+  });
+  
+  // Always add custom option
+  const optCustom = document.createElement('option');
+  optCustom.value = 'custom';
+  optCustom.textContent = 'Other / Custom Product...';
+  productSelect.appendChild(optCustom);
+  
+  // Set default selection
+  if (products.length > 0) {
+    productSelect.value = products[0].name;
+  } else {
+    productSelect.value = 'custom';
+  }
+  
+  updateProductFields();
+}
+
+function updateProductFields() {
+  const maker = makerSelect.value;
+  const isCustom = productSelect.value === 'custom';
+  
+  if (isCustom) {
+    customProductRow.classList.remove('hidden');
+    customProductInput.required = true;
+    priceInfoRow.classList.add('hidden');
+  } else {
+    customProductRow.classList.add('hidden');
+    customProductInput.required = false;
+    customProductInput.value = '';
+    
+    // Find price info
+    const products = PRODUCTS_BY_MAKER[maker] || [];
+    const selectedProd = products.find(p => p.name === productSelect.value);
+    if (selectedProd) {
+      priceInfoRow.classList.remove('hidden');
+      priceInfoDisplay.innerHTML = `
+        <span class="price-tag cost">WPL (Cost): ₹${selectedProd.wpl}</span>
+        <span class="price-tag retail">CRP (Retail): ₹${selectedProd.crp}</span>
+      `;
+    } else {
+      priceInfoRow.classList.add('hidden');
+    }
+  }
+}
+
+// Hook up event listeners for products & order generation
+makerSelect.addEventListener('change', updateProductDropdown);
+productSelect.addEventListener('change', updateProductFields);
+
+regenerateOrderNoBtn.addEventListener('click', () => {
+  orderNumberInput.value = generateRandomOrderNumber();
+});
+
 form.addEventListener('submit', async (event) => {
   event.preventDefault();
   const formData = new FormData(form);
+
+  const maker = formData.get('maker');
+  const productVal = formData.get('product');
+  let finalProduct = productVal;
+  let wpl = null;
+  let crp = null;
+  
+  if (productVal === 'custom') {
+    finalProduct = formData.get('customProduct').trim();
+  } else {
+    const products = PRODUCTS_BY_MAKER[maker] || [];
+    const selectedProd = products.find(p => p.name === productVal);
+    if (selectedProd) {
+      wpl = selectedProd.wpl;
+      crp = selectedProd.crp;
+    }
+  }
 
   const order = {
     id: Date.now().toString(),
     customerName: formData.get('customerName').trim(),
     orderNumber: formData.get('orderNumber').trim(),
-    maker: formData.get('maker'),
+    maker: maker,
     lensType: formData.get('lensType'),
-    product: formData.get('product').trim(),
+    product: finalProduct,
     productAddOn: formData.get('productAddOn').trim(),
     tint: formData.get('tint').trim(),
     rightSphere: formData.get('rightSphere').trim(),
@@ -294,14 +420,24 @@ form.addEventListener('submit', async (event) => {
       : 'NA',
     status: formData.get('status'),
     notes: formData.get('notes').trim(),
+    wpl: wpl,
+    crp: crp,
     createdAt: new Date().toISOString(),
   };
 
   const orders = await loadOrders();
   orders.unshift(order);
   saveOrders(orders);
+  
+  // Reset form and defaults
   form.reset();
+  initOrderNumber();
+  updateProductDropdown();
   updatePdFields();
+  
+  // Explicitly reset the default value for add-on
+  document.getElementById('productAddOn').value = "Both Side ARC Coating";
+
   await renderOrders();
 
   try {
@@ -325,4 +461,9 @@ clearStorageButton.addEventListener('click', () => {
 lensTypeSelect.addEventListener('change', updatePdFields);
 updatePdFields();
 
+// Populate dropdown and generate order number on load
+initOrderNumber();
+updateProductDropdown();
+
 renderOrders();
+

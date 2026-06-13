@@ -24,6 +24,8 @@ create table if not exists public.prescriptions (
   pupillary_distance_near text,
   status text not null,
   notes text,
+  wpl integer,
+  crp integer,
   created_at timestamp with time zone default timezone('utc'::text, now()) not null
 );
 

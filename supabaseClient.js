@@ -39,6 +39,8 @@ function mapToDatabaseRecord(order) {
     pupillary_distance_near: order.pupillaryDistanceNear,
     status: order.status,
     notes: order.notes,
+    wpl: order.wpl,
+    crp: order.crp,
     created_at: order.createdAt,
   };
 }
