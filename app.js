@@ -84,7 +84,7 @@ const PRODUCTS_BY_MAKER = {
   "Yash Optics": []
 };
 
-// Generates a serial-based order number (e.g. unc001, unc002)
+// Generates a serial-based order number (e.g. UNC001, UNC002)
 async function updateNextOrderNumber() {
   try {
     const orders = await loadOrders();
@@ -101,12 +101,12 @@ async function updateNextOrderNumber() {
     const nextNum = maxNum + 1;
     const padded = String(nextNum).padStart(3, '0');
     if (orderNumberInput) {
-      orderNumberInput.value = `unc${padded}`;
+      orderNumberInput.value = `UNC${padded}`;
     }
   } catch (err) {
     console.error('Failed to calculate serial order number:', err);
     if (orderNumberInput) {
-      orderNumberInput.value = 'unc001';
+      orderNumberInput.value = 'UNC001';
     }
   }
 }
