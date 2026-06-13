@@ -218,7 +218,7 @@ async function renderOrders() {
   const orders = await getFilteredOrders();
   ordersContainer.innerHTML = '';
 
-  const makers = ['Vision RX', 'Nikon', 'Yash Optics'];
+  const makers = ['Vision RX', 'Nikon', 'Yash Optics', 'Crizal'];
   const grouped = orders.reduce((acc, order) => {
     acc[order.maker] = acc[order.maker] || [];
     acc[order.maker].push(order);

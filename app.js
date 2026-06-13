@@ -72,7 +72,7 @@ const PRODUCTS_BY_MAKER = {
       }
     }
   ],
-  "Essilor/Crizal": [
+  "Crizal": [
     {
       name: "CRIZAL ROCK",
       indexes: {
