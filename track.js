@@ -12,10 +12,12 @@ function normalizeOrder(order) {
   return {
     id: order.order_id || order.id,
     customerName: order.customer_name || order.customerName,
+    frameName: order.frame_name || order.frameName || '',
     orderNumber: order.order_number || order.orderNumber,
     maker: order.maker,
     lensType: order.lens_type || order.lensType,
     product: order.product,
+    lensIndex: order.lens_index || order.lensIndex || '',
     productAddOn: order.product_add_on || order.productAddOn,
     tint: order.tint,
     rightSphere: order.right_sphere || order.rightSphere,
@@ -107,22 +109,22 @@ function printPrescription(order) {
             <td>${order.orderNumber}</td>
           </tr>
           <tr>
-            <td><strong>Maker</strong></td>
+            <td><strong>Frame Name</strong></td>
+            <td>${order.frameName || '-'}</td>
+            <td><strong>Lens Maker</strong></td>
             <td>${order.maker}</td>
+          </tr>
+          <tr>
             <td><strong>Lens Type</strong></td>
             <td>${order.lensType}</td>
+            <td><strong>Product</strong></td>
+            <td>${order.product || '-'}${order.lensIndex ? ` (${order.lensIndex} Index)` : ''}</td>
           </tr>
           <tr>
-            <td><strong>Product</strong></td>
-            <td>${order.product || '-'}</td>
             <td><strong>Add-On</strong></td>
             <td>${order.productAddOn || '-'}</td>
-          </tr>
-          <tr>
             <td><strong>Tint</strong></td>
-            <td>${order.tint || 'None'}</td>
-            <td><strong>Status</strong></td>
-            <td>${order.status}</td>
+            <td>${order.tint || 'Clear'}</td>
           </tr>
           <tr>
             <td><strong>PD Dist</strong></td>
@@ -247,6 +249,7 @@ async function renderOrders() {
         <tr>
           <th>Order #</th>
           <th>Customer</th>
+          <th>Frame</th>
           <th>Lens</th>
           <th>Product</th>
           <th>Add-On</th>
@@ -265,9 +268,11 @@ async function renderOrders() {
       row.innerHTML = `
         <td>${order.orderNumber}</td>
         <td>${order.customerName}</td>
+        <td>${order.frameName || '-'}</td>
         <td>${order.lensType}</td>
         <td>
           ${order.product || '-'}
+          ${order.lensIndex ? ` (${order.lensIndex} Index)` : ''}
           ${(order.wpl || order.crp) ? `<br/><span class="price-info-card">WPL: ₹${order.wpl || '-'} | CRP: ₹${order.crp || '-'}</span>` : ''}
         </td>
         <td>${order.productAddOn || '-'}</td>

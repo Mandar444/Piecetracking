@@ -38,6 +38,12 @@
         </div>
 
         <div class="field-row">
+          <label for="frameName">Frame Name</label>
+          <input id="frameName" name="frameName" type="text" placeholder="e.g. Ray-Ban Wayfarer, Aviator" required />
+        </div>
+
+
+        <div class="field-row">
           <label for="orderNumber">Order No.</label>
           <div class="order-no-container">
             <input id="orderNumber" name="orderNumber" type="text" required />
@@ -55,20 +61,34 @@
             <option value="Vision RX">Vision RX</option>
             <option value="Nikon">Nikon</option>
             <option value="Yash Optics">Yash Optics</option>
+            <option value="Essilor/Crizal">Essilor/Crizal</option>
           </select>
         </div>
 
         <div class="field-row">
-          <label for="lensType">Lens Type</label>
-          <select id="lensType" name="lensType" required>
-            <option value="Single Vision">Single Vision</option>
-            <option value="Progressive">Progressive</option>
-          </select>
+          <label>Lens Type</label>
+          <div class="radio-group" style="display: flex; gap: 20px; margin-top: 6px;">
+            <label style="display: flex; align-items: center; gap: 8px; font-weight: normal; cursor: pointer; color: var(--text);">
+              <input type="radio" id="lensTypeSingle" name="lensType" value="Single Vision" checked />
+              Single Vision
+            </label>
+            <label style="display: flex; align-items: center; gap: 8px; font-weight: normal; cursor: pointer; color: var(--text);">
+              <input type="radio" id="lensTypeProgressive" name="lensType" value="Progressive" />
+              Progressive
+            </label>
+          </div>
         </div>
 
         <div class="field-row">
           <label for="product">Product</label>
           <select id="product" name="product" required>
+            <!-- Dynamically populated -->
+          </select>
+        </div>
+
+        <div class="field-row" id="index-row">
+          <label for="lensIndex">Lens Index</label>
+          <select id="lensIndex" name="lensIndex">
             <!-- Dynamically populated -->
           </select>
         </div>
@@ -86,30 +106,34 @@
         </div>
 
         <div class="field-row">
-          <label for="productAddOn">Product Add-On</label>
-          <input id="productAddOn" name="productAddOn" type="text" value="Both Side ARC Coating" placeholder="e.g. Anti-Reflective, Scratch Guard" />
+          <label>ARC Coating / Add-Ons</label>
+          <div class="checkbox-group" style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 6px;">
+            <label style="display: flex; align-items: center; gap: 8px; font-weight: normal; cursor: pointer; color: var(--text);">
+              <input type="checkbox" id="coatingNone" class="coating-cb" value="None" />
+              None
+            </label>
+            <label style="display: flex; align-items: center; gap: 8px; font-weight: normal; cursor: pointer; color: var(--text);">
+              <input type="checkbox" id="coatingBoth" class="coating-cb" value="Both Side ARC Coating" checked />
+              Both Side ARC Coating
+            </label>
+            <label style="display: flex; align-items: center; gap: 8px; font-weight: normal; cursor: pointer; color: var(--text);">
+              <input type="checkbox" id="coatingSingle" class="coating-cb" value="Single Side ARC Coating" />
+              Single Side ARC Coating
+            </label>
+            <label style="display: flex; align-items: center; gap: 8px; font-weight: normal; cursor: pointer; color: var(--text);">
+              <input type="checkbox" id="coatingGreen" class="coating-cb" value="Green ARC Coating" />
+              Green ARC Coating
+            </label>
+          </div>
+          <input type="hidden" id="productAddOn" name="productAddOn" value="Both Side ARC Coating" />
         </div>
-
 
         <div class="field-row">
           <label for="tintType">Tint Type</label>
           <select id="tintType" name="tintType">
-            <option value="Clear">Clear</option>
-            <option value="Tint">Tint</option>
-          </select>
-        </div>
-
-        <div class="field-row hidden" id="tint-color-row">
-          <label for="tintColor">Tint Color</label>
-          <select id="tintColor" name="tintColor">
-            <option value="Grey">Grey</option>
-            <option value="Brown">Brown</option>
-            <option value="G-15 (Green)">G-15 (Green)</option>
-            <option value="Blue">Blue</option>
-            <option value="Pink">Pink</option>
-            <option value="Purple">Purple</option>
-            <option value="Yellow">Yellow</option>
-            <option value="custom">Other / Custom Color...</option>
+            <option value="APT">APT</option>
+            <option value="Clear" selected>Clear</option>
+            <option value="Custom">Custom</option>
           </select>
         </div>
 
@@ -162,15 +186,7 @@
           </div>
         </div>
 
-        <div class="field-row">
-          <label for="status">Status</label>
-          <select id="status" name="status" required>
-            <option value="Ordered">Ordered</option>
-            <option value="In Production">In Production</option>
-            <option value="Ready">Ready</option>
-            <option value="Delivered">Delivered</option>
-          </select>
-        </div>
+
 
         <div class="field-row">
           <label for="notes">Notes</label>

@@ -5,13 +5,13 @@ const form = document.getElementById('order-form');
 const ordersContainer = document.getElementById('ordersContainer');
 const clearStorageButton = document.getElementById('clearStorage');
 const messageBox = document.getElementById('messageBox');
-const lensTypeSelect = document.getElementById('lensType');
 const pdNearInput = document.getElementById('pupillaryDistanceNear');
 const pdNearLabel = document.querySelector('label[for="pupillaryDistanceNear"]');
 
-// New form elements selections
+// Form elements selections
 const orderNumberInput = document.getElementById('orderNumber');
 const regenerateOrderNoBtn = document.getElementById('regenerate-order-no');
+const frameNameInput = document.getElementById('frameName');
 const makerSelect = document.getElementById('maker');
 const productSelect = document.getElementById('product');
 const customProductRow = document.getElementById('custom-product-row');
@@ -19,38 +19,97 @@ const customProductInput = document.getElementById('customProduct');
 const priceInfoRow = document.getElementById('price-info-row');
 const priceInfoDisplay = document.getElementById('price-info-display');
 
+// Index selection selections
+const lensIndexSelect = document.getElementById('lensIndex');
+const indexRow = document.getElementById('index-row');
+
+// ARC checkboxes selection
+const coatingCbs = document.querySelectorAll('.coating-cb');
+const coatingNone = document.getElementById('coatingNone');
+const coatingBoth = document.getElementById('coatingBoth');
+const productAddOnInput = document.getElementById('productAddOn');
+
 // Tint elements selections
 const tintTypeSelect = document.getElementById('tintType');
-const tintColorRow = document.getElementById('tint-color-row');
-const tintColorSelect = document.getElementById('tintColor');
 const customTintRow = document.getElementById('custom-tint-row');
 const customTintColorInput = document.getElementById('customTintColor');
 
 // Internal reference products mapping
 const PRODUCTS_BY_MAKER = {
   "Vision RX": [
-    { name: "Satin+ UV Budget RX SV 1.50 index", wpl: 1330, crp: 2950 },
-    { name: "Satin+ UV Budget RX SV 1.56 index", wpl: 1530, crp: 3420 },
-    { name: "Satin+ UV Budget RX SV 1.60 index", wpl: 2430, crp: 6510 },
-    { name: "Satin+ UV Budget SV 1.56 index", wpl: 260, crp: 900 }
+    {
+      name: "Satin+ UV Budget RX SV",
+      indexes: {
+        "1.50": { wpl: 1330, crp: 2950 },
+        "1.56": { wpl: 1530, crp: 3420 },
+        "1.60": { wpl: 2430, crp: 6510 }
+      }
+    },
+    {
+      name: "Satin+ UV Budget SV",
+      indexes: {
+        "1.56": { wpl: 260, crp: 900 }
+      }
+    }
   ],
   "Nikon": [
-    { name: "Presio First 1.50 scn", wpl: 7650, crp: 22700 },
-    { name: "NK focus dig 15T6G 1.50 ECC", wpl: 6100, crp: 14400 },
-    { name: "Presio First 1.50 TGNS Ruby SCN", wpl: 11650, crp: 31600 }
+    {
+      name: "PRESIO FIRST 1.50 SCN",
+      indexes: {
+        "1.50": { wpl: 7650, crp: 22700 }
+      }
+    },
+    {
+      name: "NK FOCUS DIG 15T6G 1.50 ECC",
+      indexes: {
+        "1.50": { wpl: 6100, crp: 14400 }
+      }
+    },
+    {
+      name: "PRESIO FIRST 1.50 TGNS RUBY SCN",
+      indexes: {
+        "1.50": { wpl: 11650, crp: 31600 }
+      }
+    }
+  ],
+  "Essilor/Crizal": [
+    {
+      name: "CRIZAL ROCK",
+      indexes: {
+        "1.50": { wpl: 2210, crp: 5120 },
+        "1.56": { wpl: 2410, crp: 5590 },
+        "1.60": { wpl: 3310, crp: 8210 },
+        "1.67": { wpl: 4500, crp: 10750 }
+      }
+    }
   ],
   "Yash Optics": []
 };
 
-// Generates a random 6 digit order number
-function generateRandomOrderNumber() {
-  const num = Math.floor(100000 + Math.random() * 900000);
-  return `UNS-${num}`;
-}
-
-function initOrderNumber() {
-  if (orderNumberInput) {
-    orderNumberInput.value = generateRandomOrderNumber();
+// Generates a serial-based order number (e.g. unc001, unc002)
+async function updateNextOrderNumber() {
+  try {
+    const orders = await loadOrders();
+    let maxNum = 0;
+    orders.forEach(order => {
+      const match = order.orderNumber && order.orderNumber.toLowerCase().match(/^unc(\d+)$/);
+      if (match) {
+        const num = parseInt(match[1], 10);
+        if (num > maxNum) {
+          maxNum = num;
+        }
+      }
+    });
+    const nextNum = maxNum + 1;
+    const padded = String(nextNum).padStart(3, '0');
+    if (orderNumberInput) {
+      orderNumberInput.value = `unc${padded}`;
+    }
+  } catch (err) {
+    console.error('Failed to calculate serial order number:', err);
+    if (orderNumberInput) {
+      orderNumberInput.value = 'unc001';
+    }
   }
 }
 
@@ -69,10 +128,12 @@ function normalizeOrder(order) {
   return {
     id: order.order_id || order.id,
     customerName: order.customer_name || order.customerName,
+    frameName: order.frame_name || order.frameName || '',
     orderNumber: order.order_number || order.orderNumber,
     maker: order.maker,
     lensType: order.lens_type || order.lensType,
     product: order.product,
+    lensIndex: order.lens_index || order.lensIndex || '',
     productAddOn: order.product_add_on || order.productAddOn,
     tint: order.tint,
     rightSphere: order.right_sphere || order.rightSphere,
@@ -89,6 +150,18 @@ function normalizeOrder(order) {
     crp: order.crp,
     createdAt: order.created_at || order.createdAt,
   };
+}
+
+function updatePdFields() {
+  const lensTypeProgressiveRadio = document.getElementById('lensTypeProgressive');
+  const progressive = lensTypeProgressiveRadio && lensTypeProgressiveRadio.checked;
+  pdNearInput.required = progressive;
+  pdNearInput.disabled = !progressive;
+  pdNearInput.placeholder = progressive ? 'e.g. 56' : 'N/A';
+  pdNearLabel.textContent = progressive ? 'PD (Near)' : 'PD (Near) - N/A';
+  if (!progressive) {
+    pdNearInput.value = '';
+  }
 }
 
 async function loadOrders() {
@@ -112,17 +185,6 @@ function saveOrders(orders) {
   localStorage.setItem(STORAGE_KEY, JSON.stringify(orders));
 }
 
-function updatePdFields() {
-  const progressive = lensTypeSelect.value === 'Progressive';
-  pdNearInput.required = progressive;
-  pdNearInput.disabled = !progressive;
-  pdNearInput.placeholder = progressive ? 'e.g. 56' : 'N/A';
-  pdNearLabel.textContent = progressive ? 'PD (Near)' : 'PD (Near) - N/A';
-  if (!progressive) {
-    pdNearInput.value = '';
-  }
-}
-
 function createOrderElement(order) {
   const template = document.getElementById('order-template');
   const orderCard = template.content.firstElementChild.cloneNode(true);
@@ -138,10 +200,11 @@ function createOrderElement(order) {
   status.dataset.status = order.status;
 
   const fields = [
+    ['Frame Name', order.frameName || '-'],
     ['Lens Type', order.lensType],
-    ['Product', order.product || '-'],
+    ['Product', order.product ? `${order.product}${order.lensIndex ? ` (${order.lensIndex} Index)` : ''}` : '-'],
     ['Product Add-On', order.productAddOn || '-'],
-    ['Tint', order.tint || 'None'],
+    ['Tint', order.tint || 'Clear'],
     ['R Sphere', order.rightSphere || '-'],
     ['L Sphere', order.leftSphere || '-'],
     ['R Cylinder', order.rightCylinder || '-'],
@@ -238,22 +301,22 @@ function printPrescription(order) {
             <td>${order.orderNumber}</td>
           </tr>
           <tr>
-            <td><strong>Maker</strong></td>
+            <td><strong>Frame Name</strong></td>
+            <td>${order.frameName || '-'}</td>
+            <td><strong>Lens Maker</strong></td>
             <td>${order.maker}</td>
+          </tr>
+          <tr>
             <td><strong>Lens Type</strong></td>
             <td>${order.lensType}</td>
+            <td><strong>Product</strong></td>
+            <td>${order.product || '-'}${order.lensIndex ? ` (${order.lensIndex} Index)` : ''}</td>
           </tr>
           <tr>
-            <td><strong>Product</strong></td>
-            <td>${order.product || '-'}</td>
             <td><strong>Add-On</strong></td>
             <td>${order.productAddOn || '-'}</td>
-          </tr>
-          <tr>
             <td><strong>Tint</strong></td>
-            <td>${order.tint || 'None'}</td>
-            <td><strong>Status</strong></td>
-            <td>${order.status}</td>
+            <td>${order.tint || 'Clear'}</td>
           </tr>
           <tr>
             <td><strong>PD Dist</strong></td>
@@ -329,7 +392,13 @@ function updateProductDropdown() {
   products.forEach((prod) => {
     const opt = document.createElement('option');
     opt.value = prod.name;
-    opt.textContent = prod.name;
+    // Nikon product names in capital letters only
+    if (maker === 'Nikon') {
+      opt.textContent = prod.name.toUpperCase();
+      opt.value = prod.name.toUpperCase();
+    } else {
+      opt.textContent = prod.name;
+    }
     productSelect.appendChild(opt);
   });
   
@@ -356,47 +425,107 @@ function updateProductFields() {
   if (isCustom) {
     customProductRow.classList.remove('hidden');
     customProductInput.required = true;
+    indexRow.classList.add('hidden');
     priceInfoRow.classList.add('hidden');
   } else {
     customProductRow.classList.add('hidden');
     customProductInput.required = false;
     customProductInput.value = '';
+    indexRow.classList.remove('hidden');
     
-    // Find price info
+    // Find selected product
     const products = PRODUCTS_BY_MAKER[maker] || [];
-    const selectedProd = products.find(p => p.name === productSelect.value);
-    if (selectedProd) {
-      priceInfoRow.classList.remove('hidden');
-      priceInfoDisplay.innerHTML = `
-        <span class="price-tag cost">WPL (Cost): ₹${selectedProd.wpl}</span>
-        <span class="price-tag retail">CRP (Retail): ₹${selectedProd.crp}</span>
-      `;
-    } else {
-      priceInfoRow.classList.add('hidden');
+    const selectedProd = products.find(p => p.name.toUpperCase() === productSelect.value.toUpperCase());
+    
+    lensIndexSelect.innerHTML = '';
+    if (selectedProd && selectedProd.indexes) {
+      const indexes = Object.keys(selectedProd.indexes);
+      indexes.forEach(idx => {
+        const opt = document.createElement('option');
+        opt.value = idx;
+        opt.textContent = idx;
+        lensIndexSelect.appendChild(opt);
+      });
     }
+    
+    updatePriceDisplay();
   }
 }
 
-// Hook up event listeners for products & order generation
-makerSelect.addEventListener('change', updateProductDropdown);
+function updatePriceDisplay() {
+  const maker = makerSelect.value;
+  const productVal = productSelect.value;
+  const indexVal = lensIndexSelect.value;
+  
+  if (productVal === 'custom' || !indexVal) {
+    priceInfoRow.classList.add('hidden');
+    return;
+  }
+  
+  const products = PRODUCTS_BY_MAKER[maker] || [];
+  const selectedProd = products.find(p => p.name.toUpperCase() === productVal.toUpperCase());
+  
+  if (selectedProd && selectedProd.indexes && selectedProd.indexes[indexVal]) {
+    const priceInfo = selectedProd.indexes[indexVal];
+    priceInfoRow.classList.remove('hidden');
+    priceInfoDisplay.innerHTML = `
+      <span class="price-tag cost">WPL (Cost): ₹${priceInfo.wpl}</span>
+      <span class="price-tag retail">CRP (Retail): ₹${priceInfo.crp}</span>
+    `;
+  } else {
+    priceInfoRow.classList.add('hidden');
+  }
+}
+
+// Hook up event listeners for products & index selections
+makerSelect.addEventListener('change', () => {
+  const maker = makerSelect.value;
+  // Default Single Vision for Vision RX, Progressive for Nikon and others
+  if (maker === 'Vision RX') {
+    document.getElementById('lensTypeSingle').checked = true;
+  } else {
+    document.getElementById('lensTypeProgressive').checked = true;
+  }
+  updatePdFields();
+  updateProductDropdown();
+});
+
 productSelect.addEventListener('change', updateProductFields);
+lensIndexSelect.addEventListener('change', updatePriceDisplay);
+
+// ARC Coating checkboxes handling
+coatingCbs.forEach(cb => {
+  cb.addEventListener('change', () => {
+    if (cb.value === 'None') {
+      if (cb.checked) {
+        coatingCbs.forEach(other => {
+          if (other !== cb) other.checked = false;
+        });
+      }
+    } else {
+      if (cb.checked) {
+        document.getElementById('coatingNone').checked = false;
+      }
+    }
+    // Compile values into hidden input
+    const checkedVals = Array.from(coatingCbs)
+      .filter(c => c.checked)
+      .map(c => c.value);
+    
+    if (checkedVals.length === 0) {
+      productAddOnInput.value = 'None';
+    } else {
+      productAddOnInput.value = checkedVals.join(', ');
+    }
+  });
+});
 
 function updateTintFields() {
-  const isTint = tintTypeSelect.value === 'Tint';
-  
-  if (isTint) {
-    tintColorRow.classList.remove('hidden');
-    const isCustom = tintColorSelect.value === 'custom';
-    if (isCustom) {
-      customTintRow.classList.remove('hidden');
-      customTintColorInput.required = true;
-    } else {
-      customTintRow.classList.add('hidden');
-      customTintColorInput.required = false;
-      customTintColorInput.value = '';
-    }
+  const isCustom = tintTypeSelect.value === 'Custom';
+  if (isCustom) {
+    customTintRow.classList.remove('hidden');
+    customTintColorInput.required = true;
   } else {
-    tintColorRow.classList.add('hidden');
     customTintRow.classList.add('hidden');
     customTintColorInput.required = false;
     customTintColorInput.value = '';
@@ -404,10 +533,14 @@ function updateTintFields() {
 }
 
 tintTypeSelect.addEventListener('change', updateTintFields);
-tintColorSelect.addEventListener('change', updateTintFields);
 
-regenerateOrderNoBtn.addEventListener('click', () => {
-  orderNumberInput.value = generateRandomOrderNumber();
+regenerateOrderNoBtn.addEventListener('click', async () => {
+  await updateNextOrderNumber();
+});
+
+// Watch for lens type changes in radio buttons
+document.querySelectorAll('input[name="lensType"]').forEach(radio => {
+  radio.addEventListener('change', updatePdFields);
 });
 
 form.addEventListener('submit', async (event) => {
@@ -415,7 +548,11 @@ form.addEventListener('submit', async (event) => {
   const formData = new FormData(form);
 
   const maker = formData.get('maker');
+  const frameName = formData.get('frameName').trim();
   const productVal = formData.get('product');
+  const lensIndex = indexRow.classList.contains('hidden') ? '' : formData.get('lensIndex');
+  const lensTypeVal = form.querySelector('input[name="lensType"]:checked').value;
+  
   let finalProduct = productVal;
   let wpl = null;
   let crp = null;
@@ -424,31 +561,29 @@ form.addEventListener('submit', async (event) => {
     finalProduct = formData.get('customProduct').trim();
   } else {
     const products = PRODUCTS_BY_MAKER[maker] || [];
-    const selectedProd = products.find(p => p.name === productVal);
-    if (selectedProd) {
-      wpl = selectedProd.wpl;
-      crp = selectedProd.crp;
+    const selectedProd = products.find(p => p.name.toUpperCase() === productVal.toUpperCase());
+    if (selectedProd && selectedProd.indexes && selectedProd.indexes[lensIndex]) {
+      const pInfo = selectedProd.indexes[lensIndex];
+      wpl = pInfo.wpl;
+      crp = pInfo.crp;
     }
   }
 
   const tintType = formData.get('tintType');
-  let finalTint = 'Clear';
-  if (tintType === 'Tint') {
-    const tintColor = formData.get('tintColor');
-    if (tintColor === 'custom') {
-      finalTint = formData.get('customTintColor').trim();
-    } else {
-      finalTint = tintColor;
-    }
+  let finalTint = tintType;
+  if (tintType === 'Custom') {
+    finalTint = formData.get('customTintColor').trim();
   }
 
   const order = {
     id: Date.now().toString(),
     customerName: formData.get('customerName').trim(),
+    frameName: frameName,
     orderNumber: formData.get('orderNumber').trim(),
     maker: maker,
-    lensType: formData.get('lensType'),
+    lensType: lensTypeVal,
     product: finalProduct,
+    lensIndex: lensIndex,
     productAddOn: formData.get('productAddOn').trim(),
     tint: finalTint,
     rightSphere: formData.get('rightSphere').trim(),
@@ -458,10 +593,10 @@ form.addEventListener('submit', async (event) => {
     rightAdd: formData.get('rightAdd').trim(),
     leftAdd: formData.get('leftAdd').trim(),
     pupillaryDistanceDist: formData.get('pupillaryDistanceDist').trim(),
-    pupillaryDistanceNear: formData.get('lensType') === 'Progressive'
+    pupillaryDistanceNear: lensTypeVal === 'Progressive'
       ? formData.get('pupillaryDistanceNear').trim()
       : 'NA',
-    status: formData.get('status'),
+    status: 'Ordered', // Default status upon creation
     notes: formData.get('notes').trim(),
     wpl: wpl,
     crp: crp,
@@ -474,13 +609,24 @@ form.addEventListener('submit', async (event) => {
   
   // Reset form and defaults
   form.reset();
-  initOrderNumber();
+  await updateNextOrderNumber();
+  
+  // Re-apply maker-specific lens type default
+  if (makerSelect.value === 'Vision RX') {
+    document.getElementById('lensTypeSingle').checked = true;
+  } else {
+    document.getElementById('lensTypeProgressive').checked = true;
+  }
+  
+  // Re-apply coating default checkbox and compile
+  coatingCbs.forEach(cb => {
+    cb.checked = (cb.value === "Both Side ARC Coating");
+  });
+  productAddOnInput.value = "Both Side ARC Coating";
+
   updateProductDropdown();
   updatePdFields();
   updateTintFields();
-  
-  // Explicitly reset the default value for add-on
-  document.getElementById('productAddOn').value = "Both Side ARC Coating";
 
   await renderOrders();
 
@@ -502,11 +648,10 @@ clearStorageButton.addEventListener('click', () => {
   }
 });
 
-lensTypeSelect.addEventListener('change', updatePdFields);
 updatePdFields();
 
 // Populate dropdown and generate order number on load
-initOrderNumber();
+updateNextOrderNumber();
 updateProductDropdown();
 updateTintFields();
 

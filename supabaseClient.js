@@ -23,10 +23,12 @@ function mapToDatabaseRecord(order) {
   return {
     order_id: order.id,
     customer_name: order.customerName,
+    frame_name: order.frameName,
     order_number: order.orderNumber,
     maker: order.maker,
     lens_type: order.lensType,
     product: order.product,
+    lens_index: order.lensIndex,
     product_add_on: order.productAddOn,
     tint: order.tint,
     right_sphere: order.rightSphere,

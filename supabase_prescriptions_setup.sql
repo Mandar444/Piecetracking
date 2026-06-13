@@ -8,10 +8,12 @@
 create table if not exists public.prescriptions (
   order_id text primary key,
   customer_name text not null,
+  frame_name text,
   order_number text not null,
   maker text not null,
   lens_type text not null,
   product text,
+  lens_index text,
   product_add_on text,
   tint text,
   right_sphere text,
@@ -35,3 +37,8 @@ alter table public.prescriptions enable row level security;
 -- Create policy to allow public read/write access (select, insert, update, delete)
 drop policy if exists "Allow public read-write for prescriptions" on public.prescriptions;
 create policy "Allow public read-write for prescriptions" on public.prescriptions for all using (true) with check (true);
+
+-- Migration steps for existing databases:
+alter table public.prescriptions add column if not exists frame_name text;
+alter table public.prescriptions add column if not exists lens_index text;
+
