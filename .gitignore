@@ -1,0 +1,10 @@
+# Local environment and config
+supabaseConfig.js
+.env
+
+# Node dependencies
+node_modules/
+
+# Editor temp files
+.DS_Store
+Thumbs.db

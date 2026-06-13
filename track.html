@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Prescription Tracking</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>Prescription Tracking</h1>
+      <p>View, print, and manage prescriptions by maker on a separate page.</p>
+    </header>
+
+    <section class="tracker-card">
+      <div class="buttons">
+        <a href="index.html" class="secondary">Create New Prescription</a>
+      </div>
+
+      <div class="filter-bar">
+        <div class="filter-group">
+          <label for="filterMaker">Maker</label>
+          <select id="filterMaker">
+            <option value="All">All</option>
+            <option value="Vision RX">Vision RX</option>
+            <option value="Nikon">Nikon</option>
+            <option value="Yash Optics">Yash Optics</option>
+          </select>
+        </div>
+
+        <div class="filter-group">
+          <label for="filterLensType">Lens Type</label>
+          <select id="filterLensType">
+            <option value="All">All</option>
+            <option value="Single Vision">Single Vision</option>
+            <option value="Progressive">Progressive</option>
+          </select>
+        </div>
+
+        <div class="filter-group">
+          <label for="filterStatus">Status</label>
+          <select id="filterStatus">
+            <option value="All">All</option>
+            <option value="Ordered">Ordered</option>
+            <option value="In Production">In Production</option>
+            <option value="Ready">Ready</option>
+            <option value="Delivered">Delivered</option>
+          </select>
+        </div>
+
+        <div class="filter-group search-group">
+          <label for="filterSearch">Search</label>
+          <input id="filterSearch" type="text" placeholder="Customer or order #" />
+        </div>
+
+        <button id="clearFilters" class="secondary">Clear Filters</button>
+      </div>
+
+      <div id="ordersContainer"></div>
+    </section>
+  </div>
+
+  <script src="track.js"></script>
+</body>
+</html>

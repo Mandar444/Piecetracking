@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Eyewear Prescription Tracker</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>Eyewear Prescription Tracker</h1>
+      <p>Track prescriptions by maker, lens type, custom tint, and status.</p>
+    </header>
+
+    <section class="form-card">
+      <h2>Create New Prescription</h2>
+      <form id="order-form">
+        <div class="field-row">
+          <label for="customerName">Customer Name</label>
+          <input id="customerName" name="customerName" type="text" required />
+        </div>
+
+        <div class="field-row">
+          <label for="orderNumber">Order Number</label>
+          <input id="orderNumber" name="orderNumber" type="text" required />
+        </div>
+
+        <div class="field-row">
+          <label for="maker">Lens Maker</label>
+          <select id="maker" name="maker" required>
+            <option value="Vision RX">Vision RX</option>
+            <option value="Nikon">Nikon</option>
+            <option value="Yash Optics">Yash Optics</option>
+          </select>
+        </div>
+
+        <div class="field-row">
+          <label for="lensType">Lens Type</label>
+          <select id="lensType" name="lensType" required>
+            <option value="Single Vision">Single Vision</option>
+            <option value="Progressive">Progressive</option>
+          </select>
+        </div>
+
+        <div class="field-row">
+          <label for="product">Product</label>
+          <input id="product" name="product" type="text" placeholder="e.g. Blue Light, Photochromic" />
+        </div>
+
+        <div class="field-row">
+          <label for="productAddOn">Product Add-On</label>
+          <input id="productAddOn" name="productAddOn" type="text" placeholder="e.g. Anti-Reflective, Scratch Guard" />
+        </div>
+
+        <div class="field-row">
+          <label for="tint">Custom Tint</label>
+          <input id="tint" name="tint" type="text" placeholder="e.g. Grey, Brown, Blue" />
+        </div>
+
+        <div class="field-row split">
+          <div>
+            <label for="rightSphere">Right Sphere (R)</label>
+            <input id="rightSphere" name="rightSphere" type="text" placeholder="e.g. -2.00" />
+          </div>
+          <div>
+            <label for="leftSphere">Left Sphere (L)</label>
+            <input id="leftSphere" name="leftSphere" type="text" placeholder="e.g. -1.75" />
+          </div>
+        </div>
+
+        <div class="field-row split">
+          <div>
+            <label for="rightCylinder">Right Cylinder</label>
+            <input id="rightCylinder" name="rightCylinder" type="text" placeholder="e.g. -0.50" />
+          </div>
+          <div>
+            <label for="leftCylinder">Left Cylinder</label>
+            <input id="leftCylinder" name="leftCylinder" type="text" placeholder="e.g. -0.75" />
+          </div>
+        </div>
+
+        <div class="field-row split">
+          <div>
+            <label for="rightAdd">Right Add</label>
+            <input id="rightAdd" name="rightAdd" type="text" placeholder="e.g. +2.00" />
+          </div>
+          <div>
+            <label for="leftAdd">Left Add</label>
+            <input id="leftAdd" name="leftAdd" type="text" placeholder="e.g. +2.00" />
+          </div>
+        </div>
+
+        <div class="field-row split">
+          <div>
+            <label for="pupillaryDistance">PD</label>
+            <input id="pupillaryDistance" name="pupillaryDistance" type="text" placeholder="e.g. 62" />
+          </div>
+          <div>
+            <label for="status">Status</label>
+            <select id="status" name="status" required>
+              <option value="Ordered">Ordered</option>
+              <option value="In Production">In Production</option>
+              <option value="Ready">Ready</option>
+              <option value="Delivered">Delivered</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="field-row">
+          <label for="notes">Notes</label>
+          <textarea id="notes" name="notes" rows="3" placeholder="Optional notes"></textarea>
+        </div>
+
+        <div class="buttons">
+          <button type="submit" class="primary">Save Prescription</button>
+          <button type="button" id="clearStorage">Clear All</button>
+        </div>
+      </form>
+    </section>
+
+    <section class="tracker-card">
+      <h2>Track Orders</h2>
+      <p>Use this separate page to view and manage all saved prescriptions.</p>
+      <div class="buttons">
+        <a href="track.html" class="secondary">Open Tracking Page</a>
+      </div>
+    </section>
+  </div>
+
+  <template id="order-template">
+    <div class="order-card">
+      <div class="order-header">
+        <strong class="order-title"></strong>
+        <span class="order-status"></span>
+      </div>
+      <div class="order-details"></div>
+      <div class="order-actions">
+        <button class="print-btn">Print</button>
+        <button class="delete-btn">Delete</button>
+      </div>
+    </div>
+  </template>
+
+  <script src="app.js"></script>
+</body>
+</html>
