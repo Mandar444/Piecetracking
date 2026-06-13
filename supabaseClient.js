@@ -1,7 +1,23 @@
 import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm';
 import { SUPABASE_URL, SUPABASE_ANON_KEY } from './supabaseConfig.js';
 
-export const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+let supabaseInstance = null;
+
+try {
+  const isPlaceholderUrl = !SUPABASE_URL || SUPABASE_URL.includes('your-project-ref');
+  const isPlaceholderKey = !SUPABASE_ANON_KEY || SUPABASE_ANON_KEY.includes('your-anon-key');
+
+  if (!isPlaceholderUrl && !isPlaceholderKey) {
+    supabaseInstance = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+  } else {
+    console.warn('Supabase is not configured. Running in Local-Only mode.');
+  }
+} catch (e) {
+  console.error('Failed to initialize Supabase client:', e);
+}
+
+export const supabase = supabaseInstance;
+
 
 function mapToDatabaseRecord(order) {
   return {
@@ -28,19 +44,23 @@ function mapToDatabaseRecord(order) {
 }
 
 export async function insertPrescription(prescription) {
+  if (!supabase) throw new Error('Supabase client is not initialized.');
   const { data, error } = await supabase.from('prescriptions').insert([mapToDatabaseRecord(prescription)]);
   if (error) throw error;
   return data;
 }
 
 export async function fetchPrescriptions() {
+  if (!supabase) throw new Error('Supabase client is not initialized.');
   const { data, error } = await supabase.from('prescriptions').select('*').order('created_at', { ascending: false });
   if (error) throw error;
   return data;
 }
 
 export async function deletePrescription(orderId) {
+  if (!supabase) throw new Error('Supabase client is not initialized.');
   const { data, error } = await supabase.from('prescriptions').delete().eq('order_id', orderId);
   if (error) throw error;
   return data;
 }
+

@@ -1,0 +1,3 @@
+// Hardcoded Supabase configuration for direct deployment
+export const SUPABASE_URL = 'https://hlasknkxnosdkvbykybf.supabase.co';
+export const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImhsYXNrbmt4bm9zZGt2YnlreWJmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODExNzE0MTQsImV4cCI6MjA5Njc0NzQxNH0.KDFNgtqZIciHXCXzm5DRYJwaplZvuyEH_z7k7ujM_8M';

@@ -1,5 +1,4 @@
 # Local environment and config
-supabaseConfig.js
 .env
 
 # Node dependencies
