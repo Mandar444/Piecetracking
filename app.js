@@ -5,6 +5,9 @@ const form = document.getElementById('order-form');
 const ordersContainer = document.getElementById('ordersContainer');
 const clearStorageButton = document.getElementById('clearStorage');
 const messageBox = document.getElementById('messageBox');
+const lensTypeSelect = document.getElementById('lensType');
+const pdNearInput = document.getElementById('pupillaryDistanceNear');
+const pdNearLabel = document.querySelector('label[for="pupillaryDistanceNear"]');
 
 function showMessage(text, type = 'success') {
   if (!messageBox) return;
@@ -33,7 +36,8 @@ function normalizeOrder(order) {
     leftCylinder: order.left_cylinder || order.leftCylinder,
     rightAdd: order.right_add || order.rightAdd,
     leftAdd: order.left_add || order.leftAdd,
-    pupillaryDistance: order.pupillary_distance || order.pupillaryDistance,
+    pupillaryDistanceDist: order.pupillary_distance || order.pupillaryDistanceDist || order.pupillaryDistance,
+    pupillaryDistanceNear: order.pupillary_distance_near || order.pupillaryDistanceNear,
     status: order.status,
     notes: order.notes,
     createdAt: order.created_at || order.createdAt,
@@ -61,6 +65,17 @@ function saveOrders(orders) {
   localStorage.setItem(STORAGE_KEY, JSON.stringify(orders));
 }
 
+function updatePdFields() {
+  const progressive = lensTypeSelect.value === 'Progressive';
+  pdNearInput.required = progressive;
+  pdNearInput.disabled = !progressive;
+  pdNearInput.placeholder = progressive ? 'e.g. 56' : 'N/A';
+  pdNearLabel.textContent = progressive ? 'PD (Near)' : 'PD (Near) - N/A';
+  if (!progressive) {
+    pdNearInput.value = '';
+  }
+}
+
 function createOrderElement(order) {
   const template = document.getElementById('order-template');
   const orderCard = template.content.firstElementChild.cloneNode(true);
@@ -86,7 +101,8 @@ function createOrderElement(order) {
     ['L Cylinder', order.leftCylinder || '-'],
     ['R Add', order.rightAdd || '-'],
     ['L Add', order.leftAdd || '-'],
-    ['PD', order.pupillaryDistance || '-'],
+    ['PD (Dist)', order.pupillaryDistanceDist || '-'],
+    ['PD (Near)', order.pupillaryDistanceNear || (order.lensType === 'Progressive' ? '-' : 'NA')],
     ['Notes', order.notes || '-'],
   ];
 
@@ -188,6 +204,12 @@ function printPrescription(order) {
             <td><strong>Status</strong></td>
             <td>${order.status}</td>
           </tr>
+          <tr>
+            <td><strong>PD Dist</strong></td>
+            <td>${order.pupillaryDistanceDist || '-'}</td>
+            <td><strong>PD Near</strong></td>
+            <td>${order.pupillaryDistanceNear || (order.lensType === 'Progressive' ? '-' : 'NA')}</td>
+          </tr>
         </table>
       </div>
       <div class="section">
@@ -199,7 +221,6 @@ function printPrescription(order) {
               <th>Sphere</th>
               <th>Cylinder</th>
               <th>Add</th>
-              <th>PD</th>
             </tr>
           </thead>
           <tbody>
@@ -208,7 +229,6 @@ function printPrescription(order) {
               <td>${order.rightSphere || '-'}</td>
               <td>${order.rightCylinder || '-'}</td>
               <td>${order.rightAdd || '-'}</td>
-              <td rowspan="2">${order.pupillaryDistance || '-'}</td>
             </tr>
             <tr>
               <td>Left</td>
@@ -268,7 +288,10 @@ form.addEventListener('submit', async (event) => {
     leftCylinder: formData.get('leftCylinder').trim(),
     rightAdd: formData.get('rightAdd').trim(),
     leftAdd: formData.get('leftAdd').trim(),
-    pupillaryDistance: formData.get('pupillaryDistance').trim(),
+    pupillaryDistanceDist: formData.get('pupillaryDistanceDist').trim(),
+    pupillaryDistanceNear: formData.get('lensType') === 'Progressive'
+      ? formData.get('pupillaryDistanceNear').trim()
+      : 'NA',
     status: formData.get('status'),
     notes: formData.get('notes').trim(),
     createdAt: new Date().toISOString(),
@@ -278,6 +301,7 @@ form.addEventListener('submit', async (event) => {
   orders.unshift(order);
   saveOrders(orders);
   form.reset();
+  updatePdFields();
   await renderOrders();
 
   try {
@@ -297,5 +321,8 @@ clearStorageButton.addEventListener('click', () => {
     showMessage('Local cache cleared.', 'success');
   }
 });
+
+lensTypeSelect.addEventListener('change', updatePdFields);
+updatePdFields();
 
 renderOrders();

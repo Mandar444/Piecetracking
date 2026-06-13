@@ -24,7 +24,8 @@ function normalizeOrder(order) {
     leftCylinder: order.left_cylinder || order.leftCylinder,
     rightAdd: order.right_add || order.rightAdd,
     leftAdd: order.left_add || order.leftAdd,
-    pupillaryDistance: order.pupillary_distance || order.pupillaryDistance,
+    pupillaryDistanceDist: order.pupillary_distance || order.pupillaryDistanceDist || order.pupillaryDistance,
+    pupillaryDistanceNear: order.pupillary_distance_near || order.pupillaryDistanceNear,
     status: order.status,
     notes: order.notes,
     createdAt: order.created_at || order.createdAt,
@@ -108,6 +109,12 @@ function printPrescription(order) {
             <td><strong>Status</strong></td>
             <td>${order.status}</td>
           </tr>
+          <tr>
+            <td><strong>PD Dist</strong></td>
+            <td>${order.pupillaryDistanceDist || '-'}</td>
+            <td><strong>PD Near</strong></td>
+            <td>${order.pupillaryDistanceNear || (order.lensType === 'Progressive' ? '-' : 'NA')}</td>
+          </tr>
         </table>
       </div>
       <div class="section">
@@ -119,7 +126,6 @@ function printPrescription(order) {
               <th>Sphere</th>
               <th>Cylinder</th>
               <th>Add</th>
-              <th>PD</th>
             </tr>
           </thead>
           <tbody>
@@ -128,7 +134,6 @@ function printPrescription(order) {
               <td>${order.rightSphere || '-'}</td>
               <td>${order.rightCylinder || '-'}</td>
               <td>${order.rightAdd || '-'}</td>
-              <td rowspan="2">${order.pupillaryDistance || '-'}</td>
             </tr>
             <tr>
               <td>Left</td>

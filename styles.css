@@ -80,6 +80,65 @@ header h1 {
   letter-spacing: -0.04em;
 }
 
+@media (max-width: 700px) {
+  .container {
+    padding: 16px;
+  }
+
+  header {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+  }
+
+  .site-logo-bar {
+    justify-content: center;
+  }
+
+  .site-logo-text small {
+    font-size: 0.75rem;
+  }
+
+  .buttons,
+  .order-actions {
+    flex-direction: column;
+  }
+
+  button,
+  a.secondary {
+    width: 100%;
+  }
+
+  .tracking-table {
+    display: block;
+    overflow-x: auto;
+    width: 100%;
+  }
+
+  .tracking-table th,
+  .tracking-table td {
+    white-space: nowrap;
+  }
+}
+
+@media (max-width: 520px) {
+  .field-row.split {
+    gap: 10px;
+  }
+
+  .filter-bar {
+    margin: 12px 0;
+  }
+
+  .filter-group {
+    min-width: 100%;
+  }
+
+  .order-details {
+    grid-template-columns: 1fr;
+  }
+}
+
 header p {
   max-width: 720px;
   margin: 0;

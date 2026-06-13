@@ -4,6 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Eyewear Prescription Tracker</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg'/%3E" />
   <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
@@ -37,7 +38,7 @@
         </div>
 
         <div class="field-row">
-          <label for="orderNumber">Order Number</label>
+          <label for="orderNumber">Order No.</label>
           <input id="orderNumber" name="orderNumber" type="text" required />
         </div>
 
@@ -75,51 +76,56 @@
 
         <div class="field-row split">
           <div>
-            <label for="rightSphere">Right Sphere (R)</label>
+            <label for="rightSphere">R Sph</label>
             <input id="rightSphere" name="rightSphere" type="text" placeholder="e.g. -2.00" />
           </div>
           <div>
-            <label for="leftSphere">Left Sphere (L)</label>
+            <label for="leftSphere">L Sph</label>
             <input id="leftSphere" name="leftSphere" type="text" placeholder="e.g. -1.75" />
           </div>
         </div>
 
         <div class="field-row split">
           <div>
-            <label for="rightCylinder">Right Cylinder</label>
+            <label for="rightCylinder">R Cyl</label>
             <input id="rightCylinder" name="rightCylinder" type="text" placeholder="e.g. -0.50" />
           </div>
           <div>
-            <label for="leftCylinder">Left Cylinder</label>
+            <label for="leftCylinder">L Cyl</label>
             <input id="leftCylinder" name="leftCylinder" type="text" placeholder="e.g. -0.75" />
           </div>
         </div>
 
         <div class="field-row split">
           <div>
-            <label for="rightAdd">Right Add</label>
+            <label for="rightAdd">R Add</label>
             <input id="rightAdd" name="rightAdd" type="text" placeholder="e.g. +2.00" />
           </div>
           <div>
-            <label for="leftAdd">Left Add</label>
+            <label for="leftAdd">L Add</label>
             <input id="leftAdd" name="leftAdd" type="text" placeholder="e.g. +2.00" />
           </div>
         </div>
 
         <div class="field-row split">
           <div>
-            <label for="pupillaryDistance">PD</label>
-            <input id="pupillaryDistance" name="pupillaryDistance" type="text" placeholder="e.g. 62" />
+            <label for="pupillaryDistanceDist">PD (Dist)</label>
+            <input id="pupillaryDistanceDist" name="pupillaryDistanceDist" type="text" placeholder="e.g. 62" />
           </div>
           <div>
-            <label for="status">Status</label>
-            <select id="status" name="status" required>
-              <option value="Ordered">Ordered</option>
-              <option value="In Production">In Production</option>
-              <option value="Ready">Ready</option>
-              <option value="Delivered">Delivered</option>
-            </select>
+            <label for="pupillaryDistanceNear">PD (Near)</label>
+            <input id="pupillaryDistanceNear" name="pupillaryDistanceNear" type="text" placeholder="e.g. 56" />
           </div>
+        </div>
+
+        <div class="field-row">
+          <label for="status">Status</label>
+          <select id="status" name="status" required>
+            <option value="Ordered">Ordered</option>
+            <option value="In Production">In Production</option>
+            <option value="Ready">Ready</option>
+            <option value="Delivered">Delivered</option>
+          </select>
         </div>
 
         <div class="field-row">
