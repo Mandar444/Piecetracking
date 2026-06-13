@@ -19,6 +19,13 @@ const customProductInput = document.getElementById('customProduct');
 const priceInfoRow = document.getElementById('price-info-row');
 const priceInfoDisplay = document.getElementById('price-info-display');
 
+// Tint elements selections
+const tintTypeSelect = document.getElementById('tintType');
+const tintColorRow = document.getElementById('tint-color-row');
+const tintColorSelect = document.getElementById('tintColor');
+const customTintRow = document.getElementById('custom-tint-row');
+const customTintColorInput = document.getElementById('customTintColor');
+
 // Internal reference products mapping
 const PRODUCTS_BY_MAKER = {
   "Vision RX": [
@@ -374,6 +381,31 @@ function updateProductFields() {
 makerSelect.addEventListener('change', updateProductDropdown);
 productSelect.addEventListener('change', updateProductFields);
 
+function updateTintFields() {
+  const isTint = tintTypeSelect.value === 'Tint';
+  
+  if (isTint) {
+    tintColorRow.classList.remove('hidden');
+    const isCustom = tintColorSelect.value === 'custom';
+    if (isCustom) {
+      customTintRow.classList.remove('hidden');
+      customTintColorInput.required = true;
+    } else {
+      customTintRow.classList.add('hidden');
+      customTintColorInput.required = false;
+      customTintColorInput.value = '';
+    }
+  } else {
+    tintColorRow.classList.add('hidden');
+    customTintRow.classList.add('hidden');
+    customTintColorInput.required = false;
+    customTintColorInput.value = '';
+  }
+}
+
+tintTypeSelect.addEventListener('change', updateTintFields);
+tintColorSelect.addEventListener('change', updateTintFields);
+
 regenerateOrderNoBtn.addEventListener('click', () => {
   orderNumberInput.value = generateRandomOrderNumber();
 });
@@ -399,6 +431,17 @@ form.addEventListener('submit', async (event) => {
     }
   }
 
+  const tintType = formData.get('tintType');
+  let finalTint = 'Clear';
+  if (tintType === 'Tint') {
+    const tintColor = formData.get('tintColor');
+    if (tintColor === 'custom') {
+      finalTint = formData.get('customTintColor').trim();
+    } else {
+      finalTint = tintColor;
+    }
+  }
+
   const order = {
     id: Date.now().toString(),
     customerName: formData.get('customerName').trim(),
@@ -407,7 +450,7 @@ form.addEventListener('submit', async (event) => {
     lensType: formData.get('lensType'),
     product: finalProduct,
     productAddOn: formData.get('productAddOn').trim(),
-    tint: formData.get('tint').trim(),
+    tint: finalTint,
     rightSphere: formData.get('rightSphere').trim(),
     leftSphere: formData.get('leftSphere').trim(),
     rightCylinder: formData.get('rightCylinder').trim(),
@@ -434,6 +477,7 @@ form.addEventListener('submit', async (event) => {
   initOrderNumber();
   updateProductDropdown();
   updatePdFields();
+  updateTintFields();
   
   // Explicitly reset the default value for add-on
   document.getElementById('productAddOn').value = "Both Side ARC Coating";
@@ -464,6 +508,7 @@ updatePdFields();
 // Populate dropdown and generate order number on load
 initOrderNumber();
 updateProductDropdown();
+updateTintFields();
 
 renderOrders();
 

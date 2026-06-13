@@ -92,8 +92,30 @@
 
 
         <div class="field-row">
-          <label for="tint">Custom Tint</label>
-          <input id="tint" name="tint" type="text" placeholder="e.g. Grey, Brown, Blue" />
+          <label for="tintType">Tint Type</label>
+          <select id="tintType" name="tintType">
+            <option value="Clear">Clear</option>
+            <option value="Tint">Tint</option>
+          </select>
+        </div>
+
+        <div class="field-row hidden" id="tint-color-row">
+          <label for="tintColor">Tint Color</label>
+          <select id="tintColor" name="tintColor">
+            <option value="Grey">Grey</option>
+            <option value="Brown">Brown</option>
+            <option value="G-15 (Green)">G-15 (Green)</option>
+            <option value="Blue">Blue</option>
+            <option value="Pink">Pink</option>
+            <option value="Purple">Purple</option>
+            <option value="Yellow">Yellow</option>
+            <option value="custom">Other / Custom Color...</option>
+          </select>
+        </div>
+
+        <div class="field-row hidden" id="custom-tint-row">
+          <label for="customTintColor">Custom Tint Color</label>
+          <input id="customTintColor" name="customTintColor" type="text" placeholder="Enter custom tint color..." />
         </div>
 
         <div class="field-row split">
