@@ -213,6 +213,13 @@ textarea {
   transition: border-color 0.2s ease, box-shadow 0.2s ease;
 }
 
+input[type="checkbox"],
+input[type="radio"] {
+  width: auto;
+  margin: 0;
+  cursor: pointer;
+}
+
 input:focus,
 select:focus,
 textarea:focus {
