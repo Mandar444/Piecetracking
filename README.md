@@ -32,6 +32,21 @@ A simple local web-based system to create and track eyewear prescriptions by len
 3. Do not commit `supabaseConfig.js` to GitHub.
 4. The browser app can use `supabaseClient.js` to connect to Supabase.
 
+If you want to test locally, copy `.env.example` to `.env` and replace the values.
+
+### Vercel Deployment with Environment Variables
+
+This project now supports Vercel deployment using environment variables.
+
+1. In your Vercel dashboard, open your project settings.
+2. Under "Environment Variables", add:
+   - `SUPABASE_URL`
+   - `SUPABASE_ANON_KEY`
+3. Set the values from your Supabase project.
+4. Vercel will run the build script and generate `supabaseConfig.js` during deployment.
+
+If you deploy locally or outside Vercel, you can still use `supabaseConfig.js` directly.
+
 ### Supabase table schema
 
 Create a `prescriptions` table with these columns:

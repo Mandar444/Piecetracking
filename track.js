@@ -35,7 +35,20 @@ function normalizeOrder(order) {
 async function loadOrders() {
   try {
     const remoteOrders = await fetchPrescriptions();
-    return remoteOrders.map(normalizeOrder);
+    if (!Array.isArray(remoteOrders) || !remoteOrders.length) {
+      const raw = localStorage.getItem(STORAGE_KEY);
+      if (raw) {
+        try {
+          const localOrders = JSON.parse(raw);
+          if (Array.isArray(localOrders) && localOrders.length) {
+            return localOrders;
+          }
+        } catch (parseError) {
+          console.error('Invalid local order data', parseError);
+        }
+      }
+    }
+    return (remoteOrders || []).map(normalizeOrder);
   } catch (error) {
     console.warn('Supabase fetch failed, using local orders', error);
     const raw = localStorage.getItem(STORAGE_KEY);

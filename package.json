@@ -1,0 +1,10 @@
+{
+  "name": "eyewear-prescription-tracker",
+  "private": true,
+  "scripts": {
+    "build": "node scripts/generate-supabase-config.js"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}
