@@ -35,6 +35,8 @@ function mapToDatabaseRecord(order) {
     left_sphere: order.leftSphere,
     right_cylinder: order.rightCylinder,
     left_cylinder: order.leftCylinder,
+    right_axis: order.rightAxis,
+    left_axis: order.leftAxis,
     right_add: order.rightAdd,
     left_add: order.leftAdd,
     pupillary_distance: order.pupillaryDistanceDist,
@@ -67,4 +69,15 @@ export async function deletePrescription(orderId) {
   if (error) throw error;
   return data;
 }
+
+export async function updatePrescriptionStatus(orderId, status) {
+  if (!supabase) throw new Error('Supabase client is not initialized.');
+  const { data, error } = await supabase
+    .from('prescriptions')
+    .update({ status })
+    .eq('order_id', orderId);
+  if (error) throw error;
+  return data;
+}
+
 

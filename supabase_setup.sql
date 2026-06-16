@@ -1,19 +1,18 @@
 -- =====================================================================
--- SUPABASE PRESCRIPTIONS TABLE SETUP SCRIPT
+-- SUPABASE DATABASE SETUP FOR VRX (EYEWEAR PRESCRIPTION TRACKER)
 -- =====================================================================
--- Copy and paste this script directly into your Supabase SQL Editor:
--- https://supabase.com/dashboard/project/hlasknkxnosdkvbykybf/sql/new
+-- Copy and paste this script directly into your Supabase SQL Editor.
+-- This script creates the prescriptions table and configures Row Level Security (RLS)
+-- to allow public read and write access for the client-side application.
 
--- Create Prescriptions Table
+-- 1. Create Prescriptions Table
 create table if not exists public.prescriptions (
   order_id text primary key,
   customer_name text not null,
-  frame_name text,
   order_number text not null,
   maker text not null,
   lens_type text not null,
   product text,
-  lens_index text,
   product_add_on text,
   tint text,
   right_sphere text,
@@ -28,22 +27,17 @@ create table if not exists public.prescriptions (
   pupillary_distance_near text,
   status text not null,
   notes text,
-  wpl integer,
-  crp integer,
   created_at timestamp with time zone default timezone('utc'::text, now()) not null
 );
 
--- Enable Row Level Security (RLS) policies
+-- 2. Enable Row Level Security (RLS)
 alter table public.prescriptions enable row level security;
 
--- Create policy to allow public read/write access (select, insert, update, delete)
+-- 3. Create RLS policies for public read/write access
 drop policy if exists "Allow public read-write for prescriptions" on public.prescriptions;
 create policy "Allow public read-write for prescriptions" on public.prescriptions for all using (true) with check (true);
 
 -- Migration steps for existing databases:
-alter table public.prescriptions add column if not exists frame_name text;
-alter table public.prescriptions add column if not exists lens_index text;
 alter table public.prescriptions add column if not exists right_axis text;
 alter table public.prescriptions add column if not exists left_axis text;
-
 

@@ -74,8 +74,6 @@
           <label for="maker">Lens Maker</label>
           <select id="maker" name="maker" required>
             <option value="Vision RX">Vision RX</option>
-            <option value="Nikon">Nikon</option>
-            <option value="Yash Optics">Yash Optics</option>
           </select>
         </div>
 
@@ -180,6 +178,18 @@
 
         <div class="field-row split">
           <div>
+            <label for="rightAxis">R Axis</label>
+            <input id="rightAxis" name="rightAxis" type="text" placeholder="e.g. 180" />
+          </div>
+          <div>
+            <label for="leftAxis">L Axis</label>
+            <input id="leftAxis" name="leftAxis" type="text" placeholder="e.g. 90" />
+          </div>
+        </div>
+
+
+        <div class="field-row split">
+          <div>
             <label for="rightAdd">R Add</label>
             <input id="rightAdd" name="rightAdd" type="text" placeholder="e.g. +2.00" />
           </div>
@@ -222,20 +232,6 @@
       </div>
     </section>
   </div>
-
-  <template id="order-template">
-    <div class="order-card">
-      <div class="order-header">
-        <strong class="order-title"></strong>
-        <span class="order-status"></span>
-      </div>
-      <div class="order-details"></div>
-      <div class="order-actions">
-        <button class="print-btn">Print</button>
-        <button class="delete-btn">Delete</button>
-      </div>
-    </div>
-  </template>
 
   <script type="module" src="app.js"></script>
 </body>
