@@ -49,12 +49,6 @@ const PRODUCTS_BY_MAKER = {
       }
     },
     {
-      name: "Satin+ UV Budget SV",
-      indexes: {
-        "1.56": { wpl: 260, crp: 900 }
-      }
-    },
-    {
       name: "CRIZAL ROCK",
       indexes: {
         "1.50": { wpl: 2210, crp: 5120 },
