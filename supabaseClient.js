@@ -1,16 +1,13 @@
 import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm';
-import { SUPABASE_URL, SUPABASE_ANON_KEY } from './supabaseConfig.js';
+
+const SUPABASE_URL = 'https://ijuudgbjnkekjsrwkpih.supabase.co';
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImlqdXVkZ2Jqbmtla2pzcndrcGloIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODEzMjExODIsImV4cCI6MjA5Njg5NzE4Mn0.eD9gOrtQ5kPZqua125e6qaRthd4HjSImc0nwdB7h9uI';
 
 let supabaseInstance = null;
 
 try {
-  const isPlaceholderUrl = !SUPABASE_URL || SUPABASE_URL.includes('your-project-ref');
-  const isPlaceholderKey = !SUPABASE_ANON_KEY || SUPABASE_ANON_KEY.includes('your-anon-key');
-
-  if (!isPlaceholderUrl && !isPlaceholderKey) {
+  if (SUPABASE_URL && SUPABASE_ANON_KEY) {
     supabaseInstance = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-  } else {
-    console.warn('Supabase is not configured. Running in Local-Only mode.');
   }
 } catch (e) {
   console.error('Failed to initialize Supabase client:', e);
