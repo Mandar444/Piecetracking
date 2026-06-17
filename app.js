@@ -2,7 +2,6 @@ import { insertPrescription, fetchPrescriptions, deletePrescription } from './su
 
 const STORAGE_KEY = 'eyewearOrders';
 const form = document.getElementById('order-form');
-const clearStorageButton = document.getElementById('clearStorage');
 const messageBox = document.getElementById('messageBox');
 const pdNearInput = document.getElementById('pupillaryDistanceNear');
 const pdNearLabel = document.querySelector('label[for="pupillaryDistanceNear"]');
@@ -642,13 +641,6 @@ form.addEventListener('submit', async (event) => {
   } catch (error) {
     console.error('Supabase save failed', error);
     showMessage('Saved locally, but Supabase sync failed.', 'error');
-  }
-});
-
-clearStorageButton.addEventListener('click', () => {
-  if (confirm('Clear local cache?')) {
-    localStorage.removeItem(STORAGE_KEY);
-    showMessage('Local cache cleared.', 'success');
   }
 });
 

@@ -257,7 +257,6 @@ button.primary {
   box-shadow: 0 14px 30px rgba(42, 101, 242, 0.18);
 }
 
-button#clearStorage,
 a.secondary {
   background: #eef2ff;
   color: #1f2937;
@@ -271,14 +270,8 @@ a.secondary {
 }
 
 a.secondary:hover,
-button#clearStorage:hover,
 button#clearFilters:hover {
   filter: brightness(0.95);
-}
-
-button#clearStorage {
-  background: #f3f4f8;
-  color: var(--text);
 }
 
 .filter-bar {
