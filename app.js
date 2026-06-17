@@ -25,10 +25,8 @@ const priceInfoDisplay = document.getElementById('price-info-display');
 const lensIndexSelect = document.getElementById('lensIndex');
 const indexRow = document.getElementById('index-row');
 
-// ARC checkboxes selection
-const coatingCbs = document.querySelectorAll('.coating-cb');
-const coatingNone = document.getElementById('coatingNone');
-const coatingBoth = document.getElementById('coatingBoth');
+// ARC radio selection
+const coatingRadios = document.querySelectorAll('.coating-radio');
 const productAddOnInput = document.getElementById('productAddOn');
 
 // Tint elements selections
@@ -490,29 +488,11 @@ lensIndexSelect.addEventListener('change', updatePriceDisplay);
 
 frameModelSelect.addEventListener('change', updateFrameFields);
 
-// ARC Coating checkboxes handling
-coatingCbs.forEach(cb => {
-  cb.addEventListener('change', () => {
-    if (cb.value === 'None') {
-      if (cb.checked) {
-        coatingCbs.forEach(other => {
-          if (other !== cb) other.checked = false;
-        });
-      }
-    } else {
-      if (cb.checked) {
-        document.getElementById('coatingNone').checked = false;
-      }
-    }
-    // Compile values into hidden input
-    const checkedVals = Array.from(coatingCbs)
-      .filter(c => c.checked)
-      .map(c => c.value);
-    
-    if (checkedVals.length === 0) {
-      productAddOnInput.value = 'None';
-    } else {
-      productAddOnInput.value = checkedVals.join(', ');
+// ARC Coating radio buttons handling
+coatingRadios.forEach(radio => {
+  radio.addEventListener('change', () => {
+    if (radio.checked) {
+      productAddOnInput.value = radio.value;
     }
   });
 });
@@ -625,9 +605,9 @@ form.addEventListener('submit', async (event) => {
     document.getElementById('lensTypeProgressive').checked = true;
   }
   
-  // Re-apply coating default checkbox and compile
-  coatingCbs.forEach(cb => {
-    cb.checked = (cb.value === "Both Side ARC Coating");
+  // Re-apply coating default radio and compile
+  coatingRadios.forEach(radio => {
+    radio.checked = (radio.value === "Both Side ARC Coating");
   });
   productAddOnInput.value = "Both Side ARC Coating";
 
