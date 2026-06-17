@@ -546,6 +546,15 @@ function updatePriceDisplay() {
 // Hook up event listeners for products & index selections
 makerSelect.addEventListener('change', () => {
   const maker = makerSelect.value;
+  if (!maker) {
+    if (lensTypeProgressiveLabel) {
+      lensTypeProgressiveLabel.classList.remove('hidden');
+    }
+    document.getElementById('lensTypeSingle').checked = true;
+    updatePdFields();
+    updateProductDropdown();
+    return;
+  }
   // Default Single Vision for Vision RX, Progressive for Nikon and others
   if (maker === 'Vision RX') {
     document.getElementById('lensTypeSingle').checked = true;
@@ -702,6 +711,11 @@ form.addEventListener('submit', async (event) => {
     if (lensTypeProgressiveLabel) {
       lensTypeProgressiveLabel.classList.add('hidden');
     }
+  } else if (!makerSelect.value) {
+    if (lensTypeProgressiveLabel) {
+      lensTypeProgressiveLabel.classList.remove('hidden');
+    }
+    document.getElementById('lensTypeSingle').checked = true;
   } else {
     if (lensTypeProgressiveLabel) {
       lensTypeProgressiveLabel.classList.remove('hidden');
@@ -743,6 +757,14 @@ initializeFrameDropdowns();
 if (makerSelect.value === 'Vision RX') {
   if (lensTypeProgressiveLabel) {
     lensTypeProgressiveLabel.classList.add('hidden');
+  }
+} else if (!makerSelect.value) {
+  if (lensTypeProgressiveLabel) {
+    lensTypeProgressiveLabel.classList.remove('hidden');
+  }
+} else {
+  if (lensTypeProgressiveLabel) {
+    lensTypeProgressiveLabel.classList.remove('hidden');
   }
 }
 
