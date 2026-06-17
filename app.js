@@ -232,9 +232,20 @@ function initializeFrameDropdowns() {
   if (!frameModelSelect || !frameMaterialSelect) return;
   
   const material = frameMaterialSelect.value;
+  if (!material) {
+    // No material selected yet
+    frameModelSelect.innerHTML = '<option value="" disabled selected>Select Model</option>';
+    frameColorSelect.innerHTML = '<option value="" disabled selected>Select Color</option>';
+    frameColorContainer.classList.remove('hidden');
+    customFrameRow.classList.add('hidden');
+    customFrameInput.required = false;
+    customFrameInput.value = '';
+    return;
+  }
+  
   const allowedModels = material === 'Acetate' ? ACETATE_MODELS : METAL_MODELS;
   
-  frameModelSelect.innerHTML = '';
+  frameModelSelect.innerHTML = '<option value="" disabled selected>Select Model</option>';
   
   // Filter and populate models
   const sortedModels = Object.keys(FRAMES_CATALOG)
@@ -254,18 +265,26 @@ function initializeFrameDropdowns() {
   optCustom.textContent = 'Other / Custom Frame...';
   frameModelSelect.appendChild(optCustom);
   
-  // Default to first model
-  if (sortedModels.length > 0) {
-    frameModelSelect.value = sortedModels[0];
-  } else {
-    frameModelSelect.value = 'custom';
-  }
+  frameModelSelect.value = '';
   
   updateFrameFields();
 }
 
 function updateFrameFields() {
   const model = frameModelSelect.value;
+  
+  if (!model) {
+    // Placeholder selected
+    frameColorContainer.classList.remove('hidden');
+    customFrameRow.classList.add('hidden');
+    customFrameInput.required = false;
+    customFrameInput.value = '';
+    
+    frameColorSelect.innerHTML = '<option value="" disabled selected>Select Color</option>';
+    frameColorSelect.required = true;
+    return;
+  }
+  
   const isCustom = model === 'custom';
   
   if (isCustom) {
@@ -274,6 +293,7 @@ function updateFrameFields() {
     customFrameInput.required = true;
     
     frameColorSelect.required = false;
+    frameColorSelect.innerHTML = '<option value="" disabled selected>Select Color</option>';
   } else {
     frameColorContainer.classList.remove('hidden');
     customFrameRow.classList.add('hidden');
@@ -283,7 +303,7 @@ function updateFrameFields() {
     frameColorSelect.required = true;
     
     // Populate Colors
-    frameColorSelect.innerHTML = '';
+    frameColorSelect.innerHTML = '<option value="" disabled selected>Select Color</option>';
     const colorsObj = FRAMES_CATALOG[model] || {};
     const colors = Object.keys(colorsObj);
     colors.forEach(color => {
@@ -293,9 +313,7 @@ function updateFrameFields() {
       frameColorSelect.appendChild(opt);
     });
     
-    if (colors.length > 0) {
-      frameColorSelect.value = colors[0];
-    }
+    frameColorSelect.value = '';
   }
 }
 
