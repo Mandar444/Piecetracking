@@ -83,13 +83,6 @@ const PRODUCTS_BY_MAKER = {
       indexes: {
         "1.50": { wpl: 6100, crp: 14400 }
       }
-    },
-    {
-      name: "PRESIO FIRST 1.50 TGNS RUBY SCN",
-      type: "Progressive",
-      indexes: {
-        "1.50": { wpl: 11650, crp: 31600 }
-      }
     }
   ],
   "Yash Optics": []
