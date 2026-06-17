@@ -33,12 +33,25 @@ const productAddOnInput = document.getElementById('productAddOn');
 const tintTypeSelect = document.getElementById('tintType');
 const customTintRow = document.getElementById('custom-tint-row');
 const customTintColorInput = document.getElementById('customTintColor');
+const aptColorRow = document.getElementById('apt-color-row');
+const aptColorSelect = document.getElementById('aptColor');
+
+const frameMaterialSelect = document.getElementById('frameMaterial');
+const lensTypeProgressiveLabel = document.getElementById('lensTypeProgressiveLabel');
 
 // Internal reference products mapping
 const PRODUCTS_BY_MAKER = {
   "Vision RX": [
     {
-      name: "Satin+ UV Budget RX SV",
+      name: "Budget RX SV Crizal Rock",
+      indexes: {
+        "1.50": { wpl: 2210, crp: 5120 },
+        "1.56": { wpl: 2410, crp: 5590 },
+        "1.60": { wpl: 3310, crp: 8210 }
+      }
+    },
+    {
+      name: "Budget RX SV Satin + UV",
       indexes: {
         "1.50": { wpl: 1330, crp: 2950 },
         "1.56": { wpl: 1530, crp: 3420 },
@@ -46,12 +59,10 @@ const PRODUCTS_BY_MAKER = {
       }
     },
     {
-      name: "CRIZAL ROCK",
+      name: "Budget FSV HMC",
       indexes: {
-        "1.50": { wpl: 2210, crp: 5120 },
-        "1.56": { wpl: 2410, crp: 5590 },
-        "1.60": { wpl: 3310, crp: 8210 },
-        "1.67": { wpl: 4500, crp: 10750 }
+        "1.56": { wpl: 290, crp: 900 },
+        "1.60": { wpl: 570, crp: 1230 }
       }
     }
   ],
@@ -208,15 +219,29 @@ const FRAMES_CATALOG = {
   }
 };
 
+const ACETATE_MODELS = [
+  "Velo", "Prysm", "Vondel", "Strand", "Vapour", "Coastline", "Downtime", "Portola", "Fulton"
+];
+
+const METAL_MODELS = [
+  "Borderline", "Highline", "Paradox", "Runway", "Split", "Undertone", "Strangelove", "Crossfire", "Slowburn", "Sheer", "Wireframe"
+];
+
 // Dynamic frame dropdown populate and cascade logic
 function initializeFrameDropdowns() {
-  if (!frameModelSelect) return;
+  if (!frameModelSelect || !frameMaterialSelect) return;
+  
+  const material = frameMaterialSelect.value;
+  const allowedModels = material === 'Acetate' ? ACETATE_MODELS : METAL_MODELS;
   
   frameModelSelect.innerHTML = '';
   
-  // Populate Models
-  const models = Object.keys(FRAMES_CATALOG).sort();
-  models.forEach(model => {
+  // Filter and populate models
+  const sortedModels = Object.keys(FRAMES_CATALOG)
+    .filter(model => allowedModels.includes(model))
+    .sort();
+  
+  sortedModels.forEach(model => {
     const opt = document.createElement('option');
     opt.value = model;
     opt.textContent = model;
@@ -230,8 +255,8 @@ function initializeFrameDropdowns() {
   frameModelSelect.appendChild(optCustom);
   
   // Default to first model
-  if (models.length > 0) {
-    frameModelSelect.value = models[0];
+  if (sortedModels.length > 0) {
+    frameModelSelect.value = sortedModels[0];
   } else {
     frameModelSelect.value = 'custom';
   }
@@ -476,7 +501,13 @@ makerSelect.addEventListener('change', () => {
   // Default Single Vision for Vision RX, Progressive for Nikon and others
   if (maker === 'Vision RX') {
     document.getElementById('lensTypeSingle').checked = true;
+    if (lensTypeProgressiveLabel) {
+      lensTypeProgressiveLabel.classList.add('hidden');
+    }
   } else {
+    if (lensTypeProgressiveLabel) {
+      lensTypeProgressiveLabel.classList.remove('hidden');
+    }
     document.getElementById('lensTypeProgressive').checked = true;
   }
   updatePdFields();
@@ -498,7 +529,10 @@ coatingRadios.forEach(radio => {
 });
 
 function updateTintFields() {
-  const isCustom = tintTypeSelect.value === 'Custom';
+  const tintVal = tintTypeSelect.value;
+  const isCustom = tintVal === 'Custom';
+  const isApt = tintVal === 'APT';
+  
   if (isCustom) {
     customTintRow.classList.remove('hidden');
     customTintColorInput.required = true;
@@ -506,6 +540,14 @@ function updateTintFields() {
     customTintRow.classList.add('hidden');
     customTintColorInput.required = false;
     customTintColorInput.value = '';
+  }
+  
+  if (isApt) {
+    aptColorRow.classList.remove('hidden');
+    aptColorSelect.required = true;
+  } else {
+    aptColorRow.classList.add('hidden');
+    aptColorSelect.required = false;
   }
 }
 
@@ -557,6 +599,8 @@ form.addEventListener('submit', async (event) => {
   let finalTint = tintType;
   if (tintType === 'Custom') {
     finalTint = formData.get('customTintColor').trim();
+  } else if (tintType === 'APT') {
+    finalTint = `APT - ${formData.get('aptColor')}`;
   }
 
   const order = {
@@ -601,15 +645,21 @@ form.addEventListener('submit', async (event) => {
   // Re-apply maker-specific lens type default
   if (makerSelect.value === 'Vision RX') {
     document.getElementById('lensTypeSingle').checked = true;
+    if (lensTypeProgressiveLabel) {
+      lensTypeProgressiveLabel.classList.add('hidden');
+    }
   } else {
+    if (lensTypeProgressiveLabel) {
+      lensTypeProgressiveLabel.classList.remove('hidden');
+    }
     document.getElementById('lensTypeProgressive').checked = true;
   }
   
   // Re-apply coating default radio and compile
   coatingRadios.forEach(radio => {
-    radio.checked = (radio.value === "Both Side ARC Coating");
+    radio.checked = (radio.value === "Both side Green ARC");
   });
-  productAddOnInput.value = "Both Side ARC Coating";
+  productAddOnInput.value = "Both side Green ARC";
 
   updateProductDropdown();
   updatePdFields();
@@ -626,9 +676,19 @@ form.addEventListener('submit', async (event) => {
 
 updatePdFields();
 
+if (frameMaterialSelect) {
+  frameMaterialSelect.addEventListener('change', initializeFrameDropdowns);
+}
+
 // Populate dropdown and generate order number on load
 updateNextOrderNumber();
 updateProductDropdown();
 updateTintFields();
 initializeFrameDropdowns();
+
+if (makerSelect.value === 'Vision RX') {
+  if (lensTypeProgressiveLabel) {
+    lensTypeProgressiveLabel.classList.add('hidden');
+  }
+}
 

@@ -37,6 +37,14 @@
           <input id="customerName" name="customerName" type="text" required />
         </div>
 
+        <div class="field-row">
+          <label for="frameMaterial">Frame Material</label>
+          <select id="frameMaterial" name="frameMaterial" required>
+            <option value="Acetate">Acetate</option>
+            <option value="Metal">Metal</option>
+          </select>
+        </div>
+
         <div class="field-row split">
           <div style="flex: 1; display: flex; flex-direction: column;">
             <label for="frameModel">Frame Model</label>
@@ -86,7 +94,7 @@
               <input type="radio" id="lensTypeSingle" name="lensType" value="Single Vision" checked />
               Single Vision
             </label>
-            <label style="display: flex; align-items: center; gap: 8px; font-weight: normal; cursor: pointer; color: var(--text);">
+            <label id="lensTypeProgressiveLabel" style="display: flex; align-items: center; gap: 8px; font-weight: normal; cursor: pointer; color: var(--text);">
               <input type="radio" id="lensTypeProgressive" name="lensType" value="Progressive" />
               Progressive
             </label>
@@ -123,23 +131,15 @@
           <label>ARC Coating / Add-Ons</label>
           <div class="radio-group" style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 6px;">
             <label style="display: flex; align-items: center; gap: 8px; font-weight: normal; cursor: pointer; color: var(--text);">
-              <input type="radio" id="coatingNone" name="coating" class="coating-radio" value="None" />
-              None
+              <input type="radio" id="coatingBackside" name="coating" class="coating-radio" value="Backside Green ARC" />
+              Backside Green ARC
             </label>
             <label style="display: flex; align-items: center; gap: 8px; font-weight: normal; cursor: pointer; color: var(--text);">
-              <input type="radio" id="coatingBoth" name="coating" class="coating-radio" value="Both Side ARC Coating" checked />
-              Both Side ARC Coating
-            </label>
-            <label style="display: flex; align-items: center; gap: 8px; font-weight: normal; cursor: pointer; color: var(--text);">
-              <input type="radio" id="coatingSingle" name="coating" class="coating-radio" value="Single Side ARC Coating" />
-              Single Side ARC Coating
-            </label>
-            <label style="display: flex; align-items: center; gap: 8px; font-weight: normal; cursor: pointer; color: var(--text);">
-              <input type="radio" id="coatingGreen" name="coating" class="coating-radio" value="Green ARC Coating" />
-              Green ARC Coating
+              <input type="radio" id="coatingBothSide" name="coating" class="coating-radio" value="Both side Green ARC" checked />
+              Both side Green ARC
             </label>
           </div>
-          <input type="hidden" id="productAddOn" name="productAddOn" value="Both Side ARC Coating" />
+          <input type="hidden" id="productAddOn" name="productAddOn" value="Both side Green ARC" />
         </div>
 
         <div class="field-row">
@@ -154,6 +154,25 @@
         <div class="field-row hidden" id="custom-tint-row">
           <label for="customTintColor">Custom Tint Color</label>
           <input id="customTintColor" name="customTintColor" type="text" placeholder="Enter custom tint color..." />
+        </div>
+
+        <div class="field-row hidden" id="apt-color-row">
+          <label for="aptColor">APT Color</label>
+          <select id="aptColor" name="aptColor">
+            <option value="Grey 15%">Grey 15%</option>
+            <option value="Grey 35%">Grey 35%</option>
+            <option value="Grey 50%">Grey 50%</option>
+            <option value="Grey 75%">Grey 75%</option>
+            <option value="Grey 85%">Grey 85%</option>
+            <option value="Brown 15%">Brown 15%</option>
+            <option value="Brown 35%">Brown 35%</option>
+            <option value="Brown 50%">Brown 50%</option>
+            <option value="Brown 75%">Brown 75%</option>
+            <option value="Brown 85%">Brown 85%</option>
+            <option value="G-15">G-15</option>
+            <option value="Yellow">Yellow</option>
+            <option value="Blue">Blue</option>
+          </select>
         </div>
 
         <div class="field-row split">
