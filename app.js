@@ -436,7 +436,7 @@ function updateProductDropdown() {
   // Filter products by selected lens type
   const products = rawProducts.filter(prod => !prod.type || prod.type === selectedLensType);
   
-  productSelect.innerHTML = '';
+  productSelect.innerHTML = '<option value="" disabled selected>Select Product</option>';
   
   products.forEach((prod) => {
     const opt = document.createElement('option');
@@ -457,36 +457,51 @@ function updateProductDropdown() {
   optCustom.textContent = 'Other / Custom Product...';
   productSelect.appendChild(optCustom);
   
-  // Set default selection
-  if (products.length > 0) {
-    productSelect.value = products[0].name;
-  } else {
-    productSelect.value = 'custom';
-  }
+  productSelect.value = '';
   
   updateProductFields();
 }
 
 function updateProductFields() {
   const maker = makerSelect.value;
-  const isCustom = productSelect.value === 'custom';
+  const productVal = productSelect.value;
+  
+  if (!productVal) {
+    // Select Product placeholder is active
+    customProductRow.classList.add('hidden');
+    customProductInput.required = false;
+    customProductInput.value = '';
+    
+    indexRow.classList.remove('hidden');
+    lensIndexSelect.innerHTML = '<option value="" disabled selected>Select Index</option>';
+    lensIndexSelect.required = true;
+    updatePriceDisplay();
+    return;
+  }
+  
+  const isCustom = productVal === 'custom';
   
   if (isCustom) {
     customProductRow.classList.remove('hidden');
     customProductInput.required = true;
     indexRow.classList.add('hidden');
     priceInfoRow.classList.add('hidden');
+    
+    lensIndexSelect.required = false;
+    lensIndexSelect.innerHTML = '<option value="" disabled selected>Select Index</option>';
   } else {
     customProductRow.classList.add('hidden');
     customProductInput.required = false;
     customProductInput.value = '';
     indexRow.classList.remove('hidden');
     
+    lensIndexSelect.required = true;
+    
     // Find selected product
     const products = PRODUCTS_BY_MAKER[maker] || [];
-    const selectedProd = products.find(p => p.name.toUpperCase() === productSelect.value.toUpperCase());
+    const selectedProd = products.find(p => p.name.toUpperCase() === productVal.toUpperCase());
     
-    lensIndexSelect.innerHTML = '';
+    lensIndexSelect.innerHTML = '<option value="" disabled selected>Select Index</option>';
     if (selectedProd && selectedProd.indexes) {
       const indexes = Object.keys(selectedProd.indexes);
       indexes.forEach(idx => {
@@ -496,6 +511,8 @@ function updateProductFields() {
         lensIndexSelect.appendChild(opt);
       });
     }
+    
+    lensIndexSelect.value = '';
     
     updatePriceDisplay();
   }
