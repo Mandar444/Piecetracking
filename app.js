@@ -44,6 +44,7 @@ const PRODUCTS_BY_MAKER = {
   "Vision RX": [
     {
       name: "Budget RX SV Crizal Rock",
+      type: "Single Vision",
       indexes: {
         "1.50": { wpl: 2210, crp: 5120 },
         "1.56": { wpl: 2410, crp: 5590 },
@@ -52,6 +53,7 @@ const PRODUCTS_BY_MAKER = {
     },
     {
       name: "Budget RX SV Satin + UV",
+      type: "Single Vision",
       indexes: {
         "1.50": { wpl: 1330, crp: 2950 },
         "1.56": { wpl: 1530, crp: 3420 },
@@ -60,6 +62,7 @@ const PRODUCTS_BY_MAKER = {
     },
     {
       name: "Budget FSV HMC",
+      type: "Single Vision",
       indexes: {
         "1.56": { wpl: 290, crp: 900 },
         "1.60": { wpl: 570, crp: 1230 }
@@ -69,18 +72,21 @@ const PRODUCTS_BY_MAKER = {
   "Nikon": [
     {
       name: "PRESIO FIRST 1.50 SCN",
+      type: "Progressive",
       indexes: {
         "1.50": { wpl: 7650, crp: 22700 }
       }
     },
     {
       name: "NK FOCUS DIG 15T6G 1.50 ECC",
+      type: "Progressive",
       indexes: {
         "1.50": { wpl: 6100, crp: 14400 }
       }
     },
     {
       name: "PRESIO FIRST 1.50 TGNS RUBY SCN",
+      type: "Progressive",
       indexes: {
         "1.50": { wpl: 11650, crp: 31600 }
       }
@@ -421,7 +427,14 @@ function saveOrders(orders) {
 
 function updateProductDropdown() {
   const maker = makerSelect.value;
-  const products = PRODUCTS_BY_MAKER[maker] || [];
+  const rawProducts = PRODUCTS_BY_MAKER[maker] || [];
+  
+  // Get currently selected lens type
+  const lensTypeRadio = document.querySelector('input[name="lensType"]:checked');
+  const selectedLensType = lensTypeRadio ? lensTypeRadio.value : 'Single Vision';
+  
+  // Filter products by selected lens type
+  const products = rawProducts.filter(prod => !prod.type || prod.type === selectedLensType);
   
   productSelect.innerHTML = '';
   
@@ -577,7 +590,10 @@ regenerateOrderNoBtn.addEventListener('click', async () => {
 
 // Watch for lens type changes in radio buttons
 document.querySelectorAll('input[name="lensType"]').forEach(radio => {
-  radio.addEventListener('change', updatePdFields);
+  radio.addEventListener('change', () => {
+    updatePdFields();
+    updateProductDropdown();
+  });
 });
 
 form.addEventListener('submit', async (event) => {
