@@ -579,6 +579,9 @@ function updateTintFields() {
   } else {
     aptColorRow.classList.add('hidden');
     aptColorSelect.required = false;
+    if (aptColorSelect) {
+      aptColorSelect.value = '';
+    }
   }
 }
 
